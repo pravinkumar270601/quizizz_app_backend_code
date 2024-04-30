@@ -115,6 +115,7 @@ exports.getshootingspotDropdown = async (req, res) => {
         ],
       },
     });
+    console.log('shootingspots', shootingspots);
 
     // Map shooting spots to dropdown options
     const dropdownOptions = shootingspots.map((shootingSpot) => ({
