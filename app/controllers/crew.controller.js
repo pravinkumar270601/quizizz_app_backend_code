@@ -3,7 +3,7 @@ const db = require("../models");
 const { subcategorytable } = require("../models");
 const crewtable = db.expensetracker_t_crew_m;
 const subcategory = db.expensetracker_t_subcategory_m;
-const shootingSpot = db.expensetracker_t_shootingSpot_m;
+const shootingSpot = db.expensetracker_t_shootingspot_m ;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -114,6 +114,7 @@ exports.getshootingspotDropdown = async (req, res) => {
         ],
       },
     });
+    console.log('shootingspots', shootingspots);
 
     const dropdownOptions = shootingspots.map((shootingSpot) => ({
       spot_id: shootingSpot.spot_id,
