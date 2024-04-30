@@ -10,16 +10,16 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_category_m",
-        key: 'category_id'
-    },
+        key: "category_id",
+      },
       allowNull: true,
     },
     movie_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_movie_m",
-        key: 'movie_id'
-    },
+        key: "movie_id",
+      },
       allowNull: false,
     },
     sub_category_name: {

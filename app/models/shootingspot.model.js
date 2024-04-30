@@ -10,10 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_movie_m",
-        key: 'movie_id'
-    },
+        key: "movie_id",
+      },
       allowNull: true,
-      
     },
     contact_no: {
       type: Sequelize.STRING,

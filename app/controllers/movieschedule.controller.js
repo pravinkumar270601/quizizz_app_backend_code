@@ -103,9 +103,9 @@ exports.deleteschedule = async (req, res) => {
 
     await schedule.update(data);
 
-   RESPONSE.Success.Message = MESSAGE.DELETE;
-   RESPONSE.Success.data = {};
-   res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+    RESPONSE.Success.Message = MESSAGE.DELETE;
+    RESPONSE.Success.data = {};
+    res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
