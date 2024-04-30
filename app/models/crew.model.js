@@ -14,8 +14,8 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_category_m",
-        key: 'category_id'
-    },
+        key: "category_id",
+      },
       allowNull: false,
     },
 
@@ -23,8 +23,8 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_subcategory_m",
-        key: 'sub_category_id'
-    },
+        key: "sub_category_id",
+      },
       allowNull: true,
     },
 
@@ -32,8 +32,8 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_movie_m",
-        key: 'movie_id'
-    },
+        key: "movie_id",
+      },
       allowNull: true,
     },
     nationality: {
@@ -53,12 +53,12 @@ module.exports = (sequelize, Sequelize) => {
     active_status: {
       type: Sequelize.TINYINT,
       allowNull: true,
-      default: 1,
+      defaultValue: 1,
     },
     delete_status: {
       type: Sequelize.TINYINT,
       allowNull: true,
-      default: 0,
+      defaultValue: 0,
     },
     created_on: {
       type: Sequelize.DATEONLY,

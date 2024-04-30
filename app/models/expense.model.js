@@ -10,40 +10,40 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_movie_m",
-        key: 'movie_id'
-    },
+        key: "movie_id",
+      },
       allowNull: true,
     },
     spot_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_shootingspot_m",
-        key: 'spot_id'
-    },
+        key: "spot_id",
+      },
       allowNull: false,
     },
     category_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_category_m",
-        key: 'category_id'
-    },
+        key: "category_id",
+      },
       allowNull: false,
     },
     sub_category_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_subcategory_m",
-        key: 'sub_category_id'
-    },
+        key: "sub_category_id",
+      },
       allowNull: false,
     },
     crew_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_crew_m",
-        key: 'crew_id'
-    },
+        key: "crew_id",
+      },
       allowNull: false,
     },
     advance_amount: {

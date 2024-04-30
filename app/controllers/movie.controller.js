@@ -11,16 +11,18 @@ const { StatusCode } = require("../constants/HttpStatusCode");
 exports.create = async (req, res, next) => {
   try {
     // Check if the movie name already exists
-    const existingMovie = await movietable.findOne({ where: { movie_name: req.body.movie_name } });
+    const existingMovie = await movietable.findOne({
+      where: { movie_name: req.body.movie_name },
+    });
     if (existingMovie) {
       // If the movie already exists, throw an error
-      throw new Error('Movie already exists');
+      throw new Error("Movie already exists");
     }
 
     // If the movie doesn't exist, proceed with creating a new entry
     const data = {
       movie_name: req.body.movie_name,
-      created_on: req.body.created_on
+      created_on: req.body.created_on,
     };
 
     const response = await movietable.create(data);
@@ -34,15 +36,14 @@ exports.create = async (req, res, next) => {
   }
 };
 
-
 // Retrieve all movietable from the database.
 exports.getUserDetails = async (req, res) => {
   try {
     const response = await movietable.findAll({
-      where:{
-        active_status:1
-    },
-      attributes: { exclude: ["delete_status","created_on", "updated_on"] },
+      where: {
+        active_status: 1,
+      },
+      attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
     });
     // console.log("response",response)
 
@@ -63,7 +64,7 @@ exports.findOne = (req, res) => {
 
   movietable
     .findByPk(id, {
-      attributes: { exclude: ["delete_status","created_on", "updated_on"] },
+      attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
     })
     .then((data) => {
       if (data) {
@@ -83,21 +84,19 @@ exports.findOne = (req, res) => {
     });
 };
 
-
-
 exports.getmovieDropdown = async (req, res) => {
   try {
     const movie = await movietable.findAll({
-      attributes: ['movie_id', 'movie_name'],    
+      attributes: ["movie_id", "movie_name"],
       where: {
-        delete_status: 0 
-      }
+        delete_status: 0,
+      },
     });
 
-    const movieNames = movie.map(movie => {
+    const movieNames = movie.map((movie) => {
       return {
         movie_id: movie.movie_id,
-        movie_name: movie.movie_name
+        movie_name: movie.movie_name,
       };
     });
 
@@ -112,18 +111,21 @@ exports.getmovieDropdown = async (req, res) => {
   }
 };
 
-
-
 // Update a movietable by the movie_id in the request
 exports.update = async (req, res) => {
   try {
     const movie_id = req.params.id;
-    const { movie_name, active_status, delete_status,updated_on } = req.body;
+    const { movie_name, active_status, delete_status, updated_on } = req.body;
     const movie = await movietable.findByPk(movie_id);
     if (!movie) {
       return res.status(404).json({ error: "movie not found" });
     }
-    await movie.update({ movie_name, active_status, delete_status,updated_on });
+    await movie.update({
+      movie_name,
+      active_status,
+      delete_status,
+      updated_on,
+    });
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);

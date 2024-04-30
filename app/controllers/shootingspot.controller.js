@@ -96,13 +96,19 @@ exports.findOnespot = async (req, res) => {
 exports.updatespot = async (req, res) => {
   try {
     const spot_id = req.params.id;
-    const { location, contact_no, active_status,updated_on} = req.body;
+    const { location, contact_no, active_status, updated_on } = req.body;
     const spot = await expense.findByPk(spot_id);
-   
-    const result = await spot.update({ spot_id, location, contact_no, active_status,updated_on });
+
+    const result = await spot.update({
+      spot_id,
+      location,
+      contact_no,
+      active_status,
+      updated_on,
+    });
 
     RESPONSE.Success.Message = MESSAGE.UPDATE;
-    RESPONSE.Success.data = {}
+    RESPONSE.Success.data = {};
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
@@ -121,7 +127,7 @@ exports.deletespot = async (req, res) => {
     const result = await spot.update(data);
 
     RESPONSE.Success.Message = MESSAGE.DELETE;
-    RESPONSE.Success.data = {}
+    RESPONSE.Success.data = {};
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;

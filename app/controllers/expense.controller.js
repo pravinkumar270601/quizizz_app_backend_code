@@ -1,8 +1,9 @@
 const express = require("express");
 const db = require("../models");
-const expense = db.expensetracker_t_expense_t
+const expense = db.expensetracker_t_expense_t;
 const subcategorytable = db.expensetracker_t_subcategory_m;
-const movieschedule =db.expensetracker_t_movieschedule_t
+const movieschedule = db.expensetracker_t_movieschedule_t;
+const crewtable = db.expensetracker_t_crew_m;
 const { QueryTypes } = require("sequelize");
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -14,30 +15,30 @@ exports.createExpense = async (req, res) => {
     //create expense
     const data = {
       movie_id: req.body.movie_id,
-      spot_id:req.body.spot_id,
-      category_id:req.body.spot_id,
-      sub_category_id:req.body.sub_category_id,
-      crew_id:req.body.crew_id,
-      advance_amount:req.body.advance_amount,
-      beta:req.body.beta,
-      no_of_staffs:req.body.no_of_staffs,
-      created_on: req.body.created_on
+      spot_id: req.body.spot_id,
+      category_id: req.body.spot_id,
+      sub_category_id: req.body.sub_category_id,
+      crew_id: req.body.crew_id,
+      advance_amount: req.body.advance_amount,
+      beta: req.body.beta,
+      no_of_staffs: req.body.no_of_staffs,
+      created_on: req.body.created_on,
     };
     const response = await expense.create(data);
-    
-  //create movie schedule
-    const shootingData ={
-         movie_id:req.body.movie_id,
-         spot_id:req.body.spot_id,
-         date_of_shooting:req.body.date_of_shooting
-    }
+
+    //create movie schedule
+    const shootingData = {
+      movie_id: req.body.movie_id,
+      spot_id: req.body.spot_id,
+      date_of_shooting: req.body.date_of_shooting,
+    };
     const result = await movieschedule.create(shootingData);
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = { expense_id: response.expense_id };
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
-    console.log(error,"error")
+    console.log(error, "error");
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
@@ -57,9 +58,9 @@ left join expensetracker_t_subcategory_m as sub on e.sub_category_id=sub.sub_cat
 GROUP by expense_id;
   `;
 
-  const response = await db.sequelize.query(query, {
-    type: QueryTypes.SELECT,
-  });
+    const response = await db.sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    });
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = response;
@@ -103,20 +104,24 @@ exports.updateExpense = async (req, res) => {
   try {
     // Update expense
     const expense_id = req.params.expense_id;
-    const schedule_id = req.body.schedule_id 
+    const schedule_id = req.body.schedule_id;
     const updateData = {
       advance_amount: req.body.advance_amount,
       beta: req.body.beta,
       no_of_staffs: req.body.no_of_staffs,
-      updated_on: req.body.updated_on
+      updated_on: req.body.updated_on,
     };
-   const response = await expense.update(updateData,{ where: { expense_id: expense_id } });
+    const response = await expense.update(updateData, {
+      where: { expense_id: expense_id },
+    });
 
     // Update movie schedule
     const shootingData = {
-      date_of_shooting: req.body.date_of_shooting
+      date_of_shooting: req.body.date_of_shooting,
     };
-   const result = await movieschedule.update(shootingData, {where: { schedule_id:schedule_id } });
+    const result = await movieschedule.update(shootingData, {
+      where: { schedule_id: schedule_id },
+    });
 
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
@@ -127,7 +132,6 @@ exports.updateExpense = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
-
 
 exports.deleteExpenseAndSchedule = async (req, res) => {
   try {
@@ -140,20 +144,56 @@ exports.deleteExpenseAndSchedule = async (req, res) => {
     if (!expenses) {
       return res.status(404).json({ error: "Expense not found" });
     }
-    const response = await expense.update(expenseData,{ where: { expense_id: expense_id } });
+    const response = await expense.update(expenseData, {
+      where: { expense_id: expense_id },
+    });
 
     // Delete movie schedule
     const movieSchedule = await movieschedule.findByPk(schedule_id);
     if (!movieSchedule) {
       return res.status(404).json({ error: "Movie schedule not found" });
     }
-    const result = await movieSchedule.update(scheduleData,{ where: { schedule_id: schedule_id } });
+    const result = await movieSchedule.update(scheduleData, {
+      where: { schedule_id: schedule_id },
+    });
 
     RESPONSE.Success.Message = MESSAGE.DELETE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
-    console.log("error",error)
+    console.log("error", error);
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+  }
+};
+
+exports.getCrewDropDown = async (req, res) => {
+  try {
+    const crews = await crewtable.findAll({
+      attributes: {
+        exclude: [
+          "category_id",
+          "sub_category_id",
+          "movie_id",
+          "nationality",
+          "gender",
+          "mobile_no",
+          "created_on",
+          "updated_on",
+          "active_status",
+          "delete_status",
+        ],
+      },
+      where: {
+        active_status: 1,
+        delete_status: 0,
+      },
+    });
+
+    RESPONSE.Success.Message = MESSAGE.SUCCESS;
+    RESPONSE.Success.data = crews;
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
+  } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }

@@ -6,13 +6,13 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    movie_id: { 
+    movie_id: {
       type: Sequelize.INTEGER,
       references: {
         model: "expensetracker_t_movie_m",
-        key: 'movie_id'
-    },
-    allowNull:false 
+        key: "movie_id",
+      },
+      allowNull: false,
     },
     category_name: {
       type: Sequelize.STRING,
@@ -40,4 +40,3 @@ module.exports = (sequelize, Sequelize) => {
 
   return category;
 };
-  

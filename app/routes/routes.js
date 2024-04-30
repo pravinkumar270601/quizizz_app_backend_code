@@ -2,10 +2,9 @@ const subcategory = require("../controllers/subcategory.controller.js");
 const category = require("../controllers/category.controller.js");
 const crew = require("../controllers/crew.controller.js");
 const movie = require("../controllers/movie.controller.js");
-const movieschedule =require("../controllers/movieschedule.controller.js")
+const movieschedule = require("../controllers/movieschedule.controller.js");
 const shootingSpot = require("../controllers/shootingspot.controller.js");
-const expense = require("../controllers/expense.controller.js")
-
+const expense = require("../controllers/expense.controller.js");
 
 const router = require("express").Router();
 
@@ -20,10 +19,6 @@ router.put("/updateCategory/:id", category.update);
 
 router.delete("/deleteCategory/:id", category.delete);
 
-
-
-
-
 // subcategory
 router.post("/createSubCategory", subcategory.create);
 
@@ -37,15 +32,14 @@ router.delete("/deleteSubCategory/:id", subcategory.delete);
 
 router.get("/dropdownCategory", subcategory.getCategoryDropdown);
 
-
 //crew
 router.post("/createCrew", crew.createcrew);
 
 router.get("/getCrewDetails", crew.getuserDetails);
 
-router.get("/getCrewUserById/:id", crew.findOne);
+router.get("/getCrewUserById/:crew_id", crew.findOne);
 
-router.get("/getCrewDropdown", crew.getSubcategoryDropdown);
+router.get("/getSubCategoryDropdown", crew.getSubcategoryDropdown);
 
 router.get("/getCrewshootingDetails", crew.getshootingspotDropdown);
 
@@ -67,9 +61,6 @@ router.put("/updateMovie/:id", movie.update);
 
 router.delete("/deleteMovie/:id", movie.delete);
 
-
-
-
 // movieSchedule
 router.post("/createschedule", movieschedule.createSchedule);
 
@@ -80,8 +71,6 @@ router.get("/getscheduleById/:schedule_id", movieschedule.findOneschedule);
 router.put("/updateschedule/:id", movieschedule.updateschedule);
 
 router.delete("/deleteschedule/:id", movieschedule.deleteschedule);
-
-
 
 // shootingSpot
 router.post("/createSpot", shootingSpot.createSpot);
@@ -95,16 +84,16 @@ router.put("/updatespot/:id", shootingSpot.updatespot);
 router.delete("/deletespot/:id", shootingSpot.deletespot);
 
 //expense
-router.post("/createExpense",expense.createExpense);
+router.post("/createExpense", expense.createExpense);
 
-router.get("/getExpense",expense.getExpenseDetails);
+router.get("/getExpense", expense.getExpenseDetails);
 
-router.get('/getExpenseById/:expense_id',expense.getExpenseById);
+router.get("/getExpenseById/:expense_id", expense.getExpenseById);
 
-router.put('/updateExpense/:expense_id',expense.updateExpense);
+router.put("/updateExpense/:expense_id", expense.updateExpense);
 
-router.delete('/deleteExpense',expense.deleteExpenseAndSchedule)
+router.delete("/deleteExpense", expense.deleteExpenseAndSchedule);
 
+router.get("/getCrewDropDown", expense.getCrewDropDown);
 
-
-module.exports = router
+module.exports = router;

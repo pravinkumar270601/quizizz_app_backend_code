@@ -12,7 +12,7 @@ exports.create = async (req, res) => {
   try {
     const data = {
       sub_category_name: req.body.sub_category_name,
-      category_id:req.body.category_id,
+      category_id: req.body.category_id,
       movie_id: req.body.movie_id,
       created_on: req.body.created_on,
     };
@@ -123,7 +123,6 @@ exports.delete = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
-
 
 exports.getCategoryDropdown = async (req, res) => {
   try {
