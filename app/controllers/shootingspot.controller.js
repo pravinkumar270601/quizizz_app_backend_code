@@ -34,6 +34,7 @@ exports.createSpot = async (req, res) => {
 exports.getspotDetails = async (req, res) => {
   try {
     const query = `SELECT 
+    m.movie_id,
     m.movie_name,
     s.location,
     s.contact_no,
