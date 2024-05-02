@@ -40,9 +40,9 @@ exports.getspotDetails = async (req, res) => {
     s.contact_no,
     s.created_on
 FROM 
-    expensetracker_t_movie_m m
+    expensetracker_t_shootingspot_m s
 LEFT JOIN 
-    expensetracker_t_shootingspot_m s ON m.movie_id = s.movie_id`;
+    expensetracker_t_movie_m m ON s.movie_id = m.movie_id`;
 
     const response = await db.sequelize.query(query, {
       type: QueryTypes.SELECT,
