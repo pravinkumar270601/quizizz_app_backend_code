@@ -61,7 +61,7 @@ exports.getuserDetails = async (req, res) => {
       LEFT JOIN
         expensetracker_t_crew_m AS crew ON spot.movie_id = crew.movie_id
       WHERE
-        spot.active_status = 1;
+        spot.active_status = 1 AND crew.delete_status=0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -167,7 +167,7 @@ exports.findOne = async (req, res) => {
       LEFT JOIN
         expensetracker_t_subcategory_m AS sub_category ON crew.movie_id = sub_category.movie_id
       WHERE
-        crew.active_status = 1 AND crew.crew_id = :crew_id;
+        crew.active_status = 1 AND crew.crew_id = :crew_id AND crew.delete_status=0;
     `;
 
     const response = await db.sequelize.query(query, {

@@ -33,7 +33,8 @@ exports.getUserDetails = async (req, res) => {
       SELECT m.movie_name, c.category_name, s.sub_category_name, s.created_on 
       FROM expensetracker_t_subcategory_m AS s 
       left JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
-      left JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id;
+      left JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
+      WHERE s.active_status = 1 AND s.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -57,7 +58,7 @@ exports.findOne = async (req, res) => {
       FROM expensetracker_t_subcategory_m AS s 
       left JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
       left JOIN expensetracker_t_movie_m AS m ON s.movie_id = m.movie_id
-      WHERE s.sub_category_id = :sub_category_id AND s.active_status = 1;
+      WHERE s.sub_category_id = :sub_category_id AND s.active_status = 1 s.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {

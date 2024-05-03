@@ -55,6 +55,7 @@ left join expensetracker_t_movieschedule_t as sch on e.spot_id=sch.spot_id
 left join expensetracker_t_crew_m as c on e.crew_id = c.crew_id
 left join expensetracker_t_category_m as cat on e.category_id=cat.category_id
 left join expensetracker_t_subcategory_m as sub on e.sub_category_id=sub.sub_category_id
+WHERE e.active_status = 1 AND e.delete_status=0
 GROUP by expense_id;
   `;
 
@@ -83,7 +84,7 @@ exports.getExpenseById = async (req, res) => {
     left join expensetracker_t_crew_m as c on e.crew_id = c.crew_id
     left join expensetracker_t_category_m as cat on e.category_id=cat.category_id
     left join expensetracker_t_subcategory_m as sub on e.sub_category_id=sub.sub_category_id
-    where e.expense_id = :expense_id;
+    WHERE e.active_status = 1 AND e.delete_status = 0 AND e.expense_id = :expense_id;
     `;
 
     const response = await db.sequelize.query(query, {

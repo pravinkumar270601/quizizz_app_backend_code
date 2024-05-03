@@ -29,6 +29,10 @@ exports.createSchedule = async (req, res, next) => {
 exports.getscheduleDetails = async (req, res) => {
   try {
     const response = await expense.findAll({
+      where: {
+        active_status: 1,
+        delete_status: 0,
+      },
       attributes: { exclude: ["active_status", "delete_status"] },
     });
     // console.log("response",response)

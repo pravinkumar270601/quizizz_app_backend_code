@@ -42,6 +42,7 @@ exports.getUserDetails = async (req, res) => {
     const response = await movietable.findAll({
       where: {
         active_status: 1,
+        delete_status: 0
       },
       attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
     });
@@ -62,8 +63,7 @@ exports.getUserDetails = async (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  movietable
-    .findByPk(id, {
+  movietable.findByPk(id, {
       attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
     })
     .then((data) => {
