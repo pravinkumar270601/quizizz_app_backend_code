@@ -34,6 +34,7 @@ exports.createSpot = async (req, res) => {
 exports.getspotDetails = async (req, res) => {
   try {
     const query = `SELECT 
+    s.spot_id,
     m.movie_id,
     m.movie_name,
     s.location,
@@ -52,10 +53,9 @@ LEFT JOIN
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = response;
-    res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
-  } catch (error) {
-    // RESPONSE.Success.data = {data:response};
-
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
+  } 
+  catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }

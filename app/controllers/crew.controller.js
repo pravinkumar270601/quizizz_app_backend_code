@@ -41,6 +41,7 @@ exports.getuserDetails = async (req, res) => {
   try {
     const query = `
       SELECT
+      crew.crew_id,
         movie.movie_name,
         spot.location,
         category.category_name,

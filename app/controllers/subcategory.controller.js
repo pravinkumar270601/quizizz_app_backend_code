@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const query = `
-      SELECT m.movie_name, c.category_name, s.sub_category_name, s.created_on 
+      SELECT s.sub_category_id,m.movie_name, c.category_name, s.sub_category_name, s.created_on 
       FROM expensetracker_t_subcategory_m AS s 
       left JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
       left JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
