@@ -30,11 +30,7 @@ exports.create = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const query = `
-      SELECT s.sub_category_id,m.movie_id,c.category_id,m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
-      FROM expensetracker_t_subcategory_m AS s 
-      LEFT JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
-      LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
-      WHERE s.active_status = 1 AND s.delete_status = 0;
+      SELECT s.sub_category_id,s.movie_id,s.category_id,m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on FROM expensetracker_t_subcategory_m AS s LEFT JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id LEFT JOIN expensetracker_t_movie_m AS m ON s.movie_id = m.movie_id WHERE s.active_status = 1 AND s.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -54,7 +50,7 @@ exports.findOne = async (req, res) => {
   try {
     const sub_category_id = req.params.sub_category_id;
     const query = `
-       SELECT s.sub_category_id,c.category_id,m.movie_id,m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
+       SELECT s.sub_category_id,s.category_id,s.movie_id,m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
       FROM expensetracker_t_subcategory_m AS s 
       LEFT JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
       LEFT JOIN expensetracker_t_movie_m AS m ON s.movie_id = m.movie_id

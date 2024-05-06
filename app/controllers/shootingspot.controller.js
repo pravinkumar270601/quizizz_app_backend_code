@@ -35,7 +35,7 @@ exports.getspotDetails = async (req, res) => {
   try {
     const query = `SELECT 
     s.spot_id,
-    m.movie_id,
+    s.movie_id,
     m.movie_name,
     s.location,
     s.contact_no,
@@ -67,7 +67,7 @@ exports.findOnespot = async (req, res) => {
 
     const query = `
       SELECT
-        m.movie_id,
+        s.movie_id,
         s.spot_id,
         m.movie_name,
         s.location,
