@@ -46,6 +46,7 @@ exports.getUserDetails = async (req, res) => {
         delete_status: 0,
       },
       attributes: [
+        "movie_id",
         "movie_name",
         [
           Sequelize.literal(
@@ -76,13 +77,9 @@ exports.findOne = (req, res) => {
   movietable
     .findByPk(id, {
       attributes: [
+        "movie_id",
         "movie_name",
-        [
-          Sequelize.literal(
-            `CASE WHEN active_status = 1 THEN 'Active' ELSE 'Inactive' END`
-          ),
-          "status",
-        ],
+       "active_status",
         "created_on",
       ],
     })

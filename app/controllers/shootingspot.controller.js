@@ -39,7 +39,7 @@ exports.getspotDetails = async (req, res) => {
     m.movie_name,
     s.location,
     s.contact_no,
-    s.created_on
+    DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
 FROM 
     expensetracker_t_shootingspot_m s
 LEFT JOIN 
@@ -70,7 +70,7 @@ exports.findOnespot = async (req, res) => {
         m.movie_name,
         s.location,
         s.contact_no,
-        s.created_on
+        DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
     FROM
         expensetracker_t_shootingspot_m s
     LEFT JOIN
