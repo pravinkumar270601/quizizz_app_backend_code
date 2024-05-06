@@ -197,9 +197,13 @@ exports.update = async (req, res) => {
       updated_on: defaultUpdatedOn, // Add updated_on field with default value
     });
 
-    res.json({ message: "Updated successfully" });
+    RESPONSE.Success.Message = MESSAGE.UPDATE;
+    RESPONSE.Success.data = {};
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.log(error, "error");
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
 
