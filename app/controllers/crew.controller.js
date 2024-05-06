@@ -197,6 +197,7 @@ exports.update = async (req, res) => {
       updated_on: defaultUpdatedOn, // Add updated_on field with default value
     });
 
+    // RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.OK.code).send(RESPONSE.Success);
