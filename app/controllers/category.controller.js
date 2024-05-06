@@ -53,13 +53,14 @@ exports.findOne = async (req, res) => {
       SELECT c.category_id,m.movie_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on
       FROM expensetracker_t_category_m AS c
       LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
-      WHERE c.category_id = :category_id AND c.active_status = 1 AND c.delete_status=0;
+      WHERE c.category_id =${id} AND c.active_status = 1 AND c.delete_status=0;
     `;
 
-    const response = await db.sequelize.query(query, {
-      type: QueryTypes.SELECT,
-      replacements: { category_id: id },
-    });
+    // const response = await db.sequelize.query(query, {
+    //   type: QueryTypes.SELECT,
+    //   replacements: { category_id: id },
+    // });
+    const response = await db.sequelize.query(query);
 
     if (response.length > 0) {
       RESPONSE.Success.Message = MESSAGE.SUCCESS;

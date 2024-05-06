@@ -131,7 +131,6 @@ exports.updatespot = async (req, res) => {
 
 // Delete a spot with the specified id in the request
 exports.deletespot = async (req, res) => {
-  console.log("Entered delete function");
   try {
     const spot_id = req.params.id;
     const data = { delete_status: 1 };
