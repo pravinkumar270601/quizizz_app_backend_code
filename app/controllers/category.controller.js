@@ -1,8 +1,7 @@
-const express = require("express");
+const moment = require("moment");
+const { QueryTypes } = require("sequelize");
 const db = require("../models");
 const categorytable = db.expensetracker_t_category_m;
-const { QueryTypes } = require("sequelize");
-
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
 const { StatusCode } = require("../constants/HttpStatusCode");
@@ -12,7 +11,6 @@ exports.create = async (req, res) => {
     const data = {
       category_name: req.body.category_name,
       movie_id: req.body.movie_id,
-      created_on: req.body.created_on,
     };
 
     const response = await categorytable.create(data);
@@ -29,7 +27,7 @@ exports.create = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const query = `
-      SELECT c.category_id, c.category_name, c.created_on, m.movie_name
+      SELECT c.category_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on, m.movie_name
       FROM expensetracker_t_category_m AS c
       LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
       WHERE c.delete_status = 0 AND c.active_status = 1;
@@ -52,7 +50,7 @@ exports.findOne = async (req, res) => {
   try {
     const id = req.params.id;
     const query = `
-      SELECT c.category_id, c.category_name, c.created_on
+      SELECT c.category_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on
       FROM expensetracker_t_category_m AS c
       LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
       WHERE c.category_id = :category_id AND c.active_status = 1 AND c.delete_status=0;
@@ -88,9 +86,13 @@ exports.update = async (req, res) => {
       return res.status(404).json({ error: "Category not found" });
     }
 
+    // Set default value for updated_on if not provided in the request body
+    const defaultUpdatedOn = new Date(); // Use current date and time as default
+    const updatedOn = updated_on || defaultUpdatedOn;
+
     await category.update({
       category_name,
-      updated_on,
+      updated_on: updatedOn, // Use the default value
     });
 
     RESPONSE.Success.Message = MESSAGE.UPDATE;
@@ -101,6 +103,7 @@ exports.update = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 exports.delete = async (req, res) => {
   try {

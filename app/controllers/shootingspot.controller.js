@@ -6,7 +6,7 @@ const { MESSAGE } = require("../constants/message");
 const { StatusCode } = require("../constants/HttpStatusCode");
 const { QueryTypes } = require("sequelize");
 
-//create and save new movie
+// Create and save new movie spot
 exports.createSpot = async (req, res) => {
   try {
     const data = {
@@ -30,7 +30,7 @@ exports.createSpot = async (req, res) => {
   }
 };
 
-// Retrieve all spotdetail from the database.
+// Retrieve all spot details from the database.
 exports.getspotDetails = async (req, res) => {
   try {
     const query = `SELECT 
@@ -54,8 +54,7 @@ LEFT JOIN
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = response;
     res.status(StatusCode.OK.code).send(RESPONSE.Success);
-  } 
-  catch (error) {
+  } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
@@ -94,11 +93,11 @@ exports.findOnespot = async (req, res) => {
   }
 };
 
-// Update a movie by the id in the request
+// Update a spot by the id in the request
 exports.updatespot = async (req, res) => {
   try {
     const spot_id = req.params.id;
-    const { location, contact_no, active_status, updated_on } = req.body;
+    const { location, contact_no, active_status } = req.body; // Remove updated_on from the request body
     const spot = await expense.findByPk(spot_id);
 
     const result = await spot.update({
@@ -106,7 +105,8 @@ exports.updatespot = async (req, res) => {
       location,
       contact_no,
       active_status,
-      updated_on,
+      // Add updated_on with current timestamp directly to the updateData object
+      updated_on: new Date(),
     });
 
     RESPONSE.Success.Message = MESSAGE.UPDATE;
@@ -117,6 +117,7 @@ exports.updatespot = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 // Delete a spot with the specified id in the request
 exports.deletespot = async (req, res) => {

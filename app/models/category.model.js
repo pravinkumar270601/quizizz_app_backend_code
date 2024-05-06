@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = (sequelize, Sequelize) => {
   const category = sequelize.define("expensetracker_t_category_m", {
     category_id: {
@@ -21,6 +23,15 @@ module.exports = (sequelize, Sequelize) => {
     created_on: {
       allowNull: true,
       type: Sequelize.DATEONLY,
+      defaultValue: Sequelize.literal("CURRENT_DATE"), // set default value to current date
+      get() {
+        // Custom getter to format the date as required
+        const rawValue = this.getDataValue("created_on");
+        if (rawValue) {
+          return moment(rawValue).format("DD MMM YYYY");
+        }
+        return null;
+      },
     },
     updated_on: {
       allowNull: true,

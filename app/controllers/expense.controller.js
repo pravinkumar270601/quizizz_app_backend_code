@@ -110,8 +110,11 @@ exports.updateExpense = async (req, res) => {
       advance_amount: req.body.advance_amount,
       beta: req.body.beta,
       no_of_staffs: req.body.no_of_staffs,
-      updated_on: req.body.updated_on,
+      // Remove updated_on from the updateData object
     };
+    // Add updated_on with current timestamp directly to the updateData object
+    updateData.updated_on = new Date();
+
     const response = await expense.update(updateData, {
       where: { expense_id: expense_id },
     });
@@ -133,6 +136,7 @@ exports.updateExpense = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 exports.deleteExpenseAndSchedule = async (req, res) => {
   try {

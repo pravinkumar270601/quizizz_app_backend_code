@@ -83,7 +83,15 @@ exports.updateschedule = async (req, res) => {
     if (!schedule) {
       return res.status(404).json({ error: "schedule not found" });
     }
-    await schedule.update({ movie_id, spot_id, date_of_shooting });
+    // Remove updated_on from the updateData object
+    const updateData = {
+      movie_id,
+      spot_id,
+      date_of_shooting,
+      // Add updated_on with current timestamp directly to the updateData object
+      updated_on: new Date(),
+    };
+    await schedule.update(updateData);
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
@@ -92,6 +100,7 @@ exports.updateschedule = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 // Delete a schedule with the specified schedule_id in the request
 exports.deleteschedule = async (req, res) => {

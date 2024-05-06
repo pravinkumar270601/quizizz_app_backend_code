@@ -1,14 +1,13 @@
-const express = require("express");
+const Sequelize = require("sequelize");
+
 const db = require("../models");
 const movietable = db.expensetracker_t_movie_m;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
 const { StatusCode } = require("../constants/HttpStatusCode");
-// const moviescheduletable = require("../models/movieschedule.model");
 
-//create and save new movietable
-exports.create = async (req, res, next) => {
+exports.create = async (req, res) => {
   try {
     // Check if the movie name already exists
     const existingMovie = await movietable.findOne({
@@ -22,7 +21,7 @@ exports.create = async (req, res, next) => {
     // If the movie doesn't exist, proceed with creating a new entry
     const data = {
       movie_name: req.body.movie_name,
-      created_on: req.body.created_on,
+      active_status: req.body.active_status,
     };
 
     const response = await movietable.create(data);
@@ -36,45 +35,65 @@ exports.create = async (req, res, next) => {
   }
 };
 
-// Retrieve all movietable from the database.
+
+// Retrieve all movies from the database.
+
+
 exports.getUserDetails = async (req, res) => {
   try {
     const response = await movietable.findAll({
       where: {
-        active_status: 1,
-        delete_status: 0
+        delete_status: 0,
       },
-      attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
+      attributes: [
+        "movie_name",
+        [
+          Sequelize.literal(
+            `CASE WHEN active_status = 1 THEN 'Active' ELSE 'Inactive' END`
+          ),
+          "status",
+        ],
+        "created_on",
+      ],
     });
-    // console.log("response",response)
 
+    // Send the response with the desired format
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = response;
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
-    // RESPONSE.Success.data = {data:response};
-
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
 
-// Find a single movietable with an movie_id
+
+// Find a single movie with a movie_id
+
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  movietable.findByPk(id, {
-      attributes: { exclude: ["delete_status", "created_on", "updated_on"] },
+  movietable
+    .findByPk(id, {
+      attributes: [
+        "movie_name",
+        [
+          Sequelize.literal(
+            `CASE WHEN active_status = 1 THEN 'Active' ELSE 'Inactive' END`
+          ),
+          "status",
+        ],
+        "created_on",
+      ],
     })
     .then((data) => {
       if (data) {
         RESPONSE.Success.Message = MESSAGE.SUCCESS;
         RESPONSE.Success.data = data;
         res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
-        //   res.send({data:data})
       } else {
         res.status(404).send({
-          message: `Cannot find movietable with id=${id}.`,
+          message: `Cannot find movie with id=${id}.`,
         });
       }
     })
@@ -93,12 +112,10 @@ exports.getmovieDropdown = async (req, res) => {
       },
     });
 
-    const movieNames = movie.map((movie) => {
-      return {
-        movie_id: movie.movie_id,
-        movie_name: movie.movie_name,
-      };
-    });
+    const movieNames = movie.map((movie) => ({
+      movie_id: movie.movie_id,
+      movie_name: movie.movie_name,
+    }));
 
     // Send the category names as a response
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -111,21 +128,24 @@ exports.getmovieDropdown = async (req, res) => {
   }
 };
 
-// Update a movietable by the movie_id in the request
+// Update a movie by the movie_id in the request
 exports.update = async (req, res) => {
   try {
     const movie_id = req.params.id;
-    const { movie_name, active_status, delete_status, updated_on } = req.body;
+    const { movie_name, active_status, delete_status } = req.body;
     const movie = await movietable.findByPk(movie_id);
     if (!movie) {
-      return res.status(404).json({ error: "movie not found" });
+      return res.status(404).json({ error: "Movie not found" });
     }
-    await movie.update({
+    // Remove updated_on from the updateData object
+    const updateData = {
       movie_name,
       active_status,
       delete_status,
-      updated_on,
-    });
+      // Add updated_on with current timestamp directly to the updateData object
+      updated_on: new Date(),
+    };
+    await movie.update(updateData);
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
@@ -135,7 +155,7 @@ exports.update = async (req, res) => {
   }
 };
 
-// Delete a movietable with the specified movie_id in the request
+// Delete a movie with the specified movie_id in the request
 exports.delete = async (req, res) => {
   try {
     const movie_id = req.params.id;
@@ -143,7 +163,7 @@ exports.delete = async (req, res) => {
     const movie = await movietable.findByPk(movie_id);
 
     if (!movie) {
-      return res.status(404).json({ error: "movie not found" });
+      return res.status(404).json({ error: "Movie not found" });
     }
 
     await movie.update(data);

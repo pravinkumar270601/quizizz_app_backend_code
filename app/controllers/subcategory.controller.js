@@ -14,7 +14,7 @@ exports.create = async (req, res) => {
       sub_category_name: req.body.sub_category_name,
       category_id: req.body.category_id,
       movie_id: req.body.movie_id,
-      created_on: req.body.created_on,
+      created_on: new Date().toISOString().slice(0, 10), // Change to YYYY-MM-DD format
     };
     const response = await subcategorytable.create(data);
 
@@ -30,10 +30,10 @@ exports.create = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const query = `
-      SELECT s.sub_category_id,m.movie_name, c.category_name, s.sub_category_name, s.created_on 
+      SELECT s.sub_category_id,m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
       FROM expensetracker_t_subcategory_m AS s 
-      left JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
-      left JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
+      LEFT JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
+      LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
       WHERE s.active_status = 1 AND s.delete_status = 0;
     `;
 
@@ -54,11 +54,11 @@ exports.findOne = async (req, res) => {
   try {
     const sub_category_id = req.params.sub_category_id;
     const query = `
-       SELECT m.movie_name, c.category_name, s.sub_category_name, s.created_on 
+       SELECT m.movie_name, c.category_name, s.sub_category_name, DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
       FROM expensetracker_t_subcategory_m AS s 
-      left JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
-      left JOIN expensetracker_t_movie_m AS m ON s.movie_id = m.movie_id
-      WHERE s.sub_category_id = :sub_category_id AND s.active_status = 1 s.delete_status = 0;
+      LEFT JOIN expensetracker_t_category_m AS c ON s.category_id = c.category_id 
+      LEFT JOIN expensetracker_t_movie_m AS m ON s.movie_id = m.movie_id
+      WHERE s.sub_category_id = :sub_category_id AND s.active_status = 1 AND s.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -86,14 +86,19 @@ exports.findOne = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
-    const { sub_category_name, movie_id, created_on } = req.body;
+    const { sub_category_name, movie_id } = req.body; // Remove created_on from the request body
     const subcategory = await subcategorytable.findByPk(id);
     if (!subcategory) {
       return res
         .status(404)
         .send({ message: `Subcategory with id=${id} not found.` });
     }
-    await subcategory.update({ sub_category_name, movie_id, created_on });
+    await subcategory.update({
+      sub_category_name,
+      movie_id,
+      // Add created_on with current timestamp directly to the updateData object
+      created_on: new Date(),
+    });
     RESPONSE.Success.Message = MESSAGE.UPDATE;
     RESPONSE.Success.data = {};
     res.status(StatusCode.OK.code).send(RESPONSE.Success);

@@ -1,4 +1,3 @@
-// const express = require("express");
 const db = require("../models");
 const { subcategorytable } = require("../models");
 const crewtable = db.expensetracker_t_crew_m;
@@ -8,8 +7,8 @@ const shootingSpot = db.expensetracker_t_shootingspot_m;
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
 const { StatusCode } = require("../constants/HttpStatusCode");
+const { QueryTypes } = require("sequelize");
 
-//create and save new categorytable
 exports.createcrew = async (req, res) => {
   try {
     const data = {
@@ -20,7 +19,7 @@ exports.createcrew = async (req, res) => {
       movie_id: req.body.movie_id,
       nationality: req.body.nationality,
       gender: req.body.gender,
-      creatd_on: req.body.creatd_on,
+      created_on: req.body.created_on, // Corrected typo here
     };
     const response = await crewtable.create(data);
 
@@ -34,14 +33,11 @@ exports.createcrew = async (req, res) => {
   }
 };
 
-// Retrieve all crewtable from the database.
-const { QueryTypes } = require("sequelize");
-
 exports.getuserDetails = async (req, res) => {
   try {
     const query = `
       SELECT
-      crew.crew_id,
+        crew.crew_id,
         movie.movie_name,
         spot.location,
         category.category_name,
@@ -50,19 +46,19 @@ exports.getuserDetails = async (req, res) => {
         crew.gender,
         crew.mobile_no,
         crew.nationality,
-        spot.created_on
+        DATE_FORMAT(spot.created_on, '%Y-%m-%d') AS created_on
       FROM
-        expensetracker_t_shootingspot_m AS spot
+        expensetracker_t_crew_m AS crew
+      LEFT JOIN
+        expensetracker_t_shootingspot_m AS spot ON crew.movie_id = spot.movie_id
       LEFT JOIN
         expensetracker_t_movie_m AS movie ON spot.movie_id = movie.movie_id
       LEFT JOIN
-        expensetracker_t_category_m AS category ON spot.movie_id = category.movie_id
+        expensetracker_t_category_m AS category ON crew.category_id = category.category_id
       LEFT JOIN
-        expensetracker_t_subcategory_m AS sub_category ON spot.movie_id = sub_category.movie_id
-      LEFT JOIN
-        expensetracker_t_crew_m AS crew ON spot.movie_id = crew.movie_id
+        expensetracker_t_subcategory_m AS sub_category ON crew.sub_category_id = sub_category.sub_category_id
       WHERE
-        spot.active_status = 1 AND crew.delete_status=0;
+        crew.active_status = 1 AND crew.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -71,14 +67,13 @@ exports.getuserDetails = async (req, res) => {
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = response;
-    res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
 
-// Get subcategory dropdown options
 exports.getSubcategoryDropdown = async (req, res) => {
   try {
     const subcategories = await subcategory.findAll({
@@ -103,7 +98,6 @@ exports.getSubcategoryDropdown = async (req, res) => {
 
 exports.getshootingspotDropdown = async (req, res) => {
   try {
-    // Fetch shooting spots from the database, excluding certain attributes
     const shootingspots = await shootingSpot.findAll({
       attributes: {
         exclude: [
@@ -116,33 +110,21 @@ exports.getshootingspotDropdown = async (req, res) => {
         ],
       },
     });
-    console.log('shootingspots', shootingspots);
 
-    // Map shooting spots to dropdown options
     const dropdownOptions = shootingspots.map((shootingSpot) => ({
       spot_id: shootingSpot.spot_id,
       location: shootingSpot.location,
     }));
 
-    // Prepare success response
-    const successResponse = {
-      message: MESSAGE.SUCCESS,
-      data: dropdownOptions,
-    };
-
-    // Send success response
-    res.status(StatusCode.OK.code).send(successResponse);
+    RESPONSE.Success.Message = MESSAGE.SUCCESS;
+    RESPONSE.Success.data = dropdownOptions;
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
-    // Prepare failure response
-    const failureResponse = {
-      message: error.message || MESSAGE.INTERNAL_SERVER_ERROR,
-    };
-
-    // Send failure response
-    res.status(StatusCode.SERVER_ERROR.code).send(failureResponse);
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
-// Find a single crewtable with an crew_id
+
 exports.findOne = async (req, res) => {
   try {
     const crew_id = req.params.crew_id;
@@ -156,7 +138,7 @@ exports.findOne = async (req, res) => {
         crew.gender,
         crew.mobile_no,
         crew.nationality,
-        spot.created_on
+        DATE_FORMAT(spot.created_on, '%Y-%m-%d') AS created_on
       FROM
         expensetracker_t_crew_m AS crew
       LEFT JOIN
@@ -164,28 +146,27 @@ exports.findOne = async (req, res) => {
       LEFT JOIN
         expensetracker_t_movie_m AS movie ON crew.movie_id = movie.movie_id
       LEFT JOIN
-        expensetracker_t_category_m AS category ON crew.movie_id = category.movie_id
+        expensetracker_t_category_m AS category ON crew.category_id = category.category_id
       LEFT JOIN
-        expensetracker_t_subcategory_m AS sub_category ON crew.movie_id = sub_category.movie_id
+        expensetracker_t_subcategory_m AS sub_category ON crew.sub_category_id = sub_category.sub_category_id
       WHERE
-        crew.active_status = 1 AND crew.crew_id = :crew_id AND crew.delete_status=0;
+        crew.active_status = 1 AND crew.crew_id = :crew_id AND crew.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
       type: QueryTypes.SELECT,
       replacements: { crew_id: crew_id },
     });
-    console.log(response);
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = response; // Modified this line
+    RESPONSE.Success.data = response;
     res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
-// Update a crewtable by the crew_id in the request
+
 exports.update = async (req, res) => {
   try {
     const crew_id = req.params.id;
@@ -197,12 +178,15 @@ exports.update = async (req, res) => {
       gender,
       mobile_no,
       nationality,
-      created_on,
     } = req.body;
     const crew = await crewtable.findByPk(crew_id);
     if (!crew) {
-      return res.status(404).json({ error: "crew not found" });
+      return res.status(404).json({ error: "Crew not found" });
     }
+
+    // Set default value for updated_on if not provided in the request body
+    const defaultUpdatedOn = new Date(); // Use current date and time as default
+
     await crew.update({
       crew_name,
       category_id,
@@ -211,15 +195,16 @@ exports.update = async (req, res) => {
       gender,
       mobile_no,
       nationality,
-      created_on,
+      updated_on: defaultUpdatedOn, // Add updated_on field with default value
     });
-    res.json({ message: "UPDATED SUCCESSFULLY" });
+
+    res.json({ message: "Updated successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// Delete a crewtable with the specified crew_id in the request
+
 exports.delete = async (req, res) => {
   try {
     const crew_id = req.params.id;
@@ -228,14 +213,13 @@ exports.delete = async (req, res) => {
     const crew = await crewtable.findByPk(crew_id);
 
     if (!crew) {
-      return res.status(404).json({ error: "crew not found" });
+      return res.status(404).json({ error: "Crew not found" });
     }
 
     await crew.update(data);
 
-    // Send response with success message and updated data
     res.json({
-      message: "DELETED SUCCESSFULLY",
+      message: "Deleted successfully",
       data: {
         crew_id: crew_id,
         delete_status: 1,
