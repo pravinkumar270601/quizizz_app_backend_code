@@ -140,9 +140,11 @@ exports.updateExpense = async (req, res) => {
 
 exports.deleteExpenseAndSchedule = async (req, res) => {
   try {
-    const { expense_id, schedule_id } = req.body;
+    //const { expense_id, schedule_id } = req.params;
     const expenseData = { delete_status: 1 };
     const scheduleData = { delete_status: 1 };
+    const expense_id = req.params.expense_id;
+    const schedule_id = req.params.schedule_id;
 
     // Delete expense
     const expenses = await expense.findByPk(expense_id);
@@ -150,7 +152,7 @@ exports.deleteExpenseAndSchedule = async (req, res) => {
       return res.status(404).json({ error: "Expense not found" });
     }
     const response = await expense.update(expenseData, {
-      where: { expense_id: expense_id },
+      where: { expense_id:expense_id},
     });
 
     // Delete movie schedule

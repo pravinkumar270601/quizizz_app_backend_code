@@ -66,28 +66,37 @@ exports.findOnespot = async (req, res) => {
     const spot_id = req.params.spot_id;
 
     const query = `
-        SELECT
+      SELECT
+        m.movie_id,
+        s.spot_id,
         m.movie_name,
         s.location,
         s.contact_no,
         DATE_FORMAT(s.created_on, '%d %b %Y') AS created_on 
-    FROM
+      FROM
         expensetracker_t_shootingspot_m s
-    LEFT JOIN
+      LEFT JOIN
         expensetracker_t_movie_m m ON s.movie_id = m.movie_id
-    WHERE
+      WHERE
         s.active_status = 1 AND s.delete_status = 0
         AND s.spot_id = :spot_id`;
 
     const response = await db.sequelize.query(query, {
-      replacements: { spot_id: spot_id },
       type: QueryTypes.SELECT,
+      replacements: { spot_id: spot_id }, // Bind spot_id value
     });
 
+    // Check if a spot with the given ID exists
+    if (response.length === 0) {
+      return res.status(404).json({ error: "Spot not found" });
+    }
+
+    // Respond with the spot data
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = response;
-    res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+    RESPONSE.Success.data = response[0]; // Assuming only one spot is expected
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
+    // Handle any errors that occur during execution
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
@@ -97,13 +106,14 @@ exports.findOnespot = async (req, res) => {
 exports.updatespot = async (req, res) => {
   try {
     const spot_id = req.params.id;
-    const { location, contact_no, active_status } = req.body; // Remove updated_on from the request body
+    const { location, contact_no,movie_id, active_status } = req.body; // Remove updated_on from the request body
     const spot = await expense.findByPk(spot_id);
 
     const result = await spot.update({
       spot_id,
       location,
       contact_no,
+      movie_id,
       active_status,
       // Add updated_on with current timestamp directly to the updateData object
       updated_on: new Date(),

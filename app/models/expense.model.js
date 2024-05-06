@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = (sequelize, Sequelize) => {
   const expense = sequelize.define("expensetracker_t_expense_t", {
     expense_id: {

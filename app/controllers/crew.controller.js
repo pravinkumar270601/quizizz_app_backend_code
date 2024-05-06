@@ -18,8 +18,7 @@ exports.createcrew = async (req, res) => {
       mobile_no: req.body.mobile_no,
       movie_id: req.body.movie_id,
       nationality: req.body.nationality,
-      gender: req.body.gender,
-      created_on: req.body.created_on, // Corrected typo here
+      gender: req.body.gender, 
     };
     const response = await crewtable.create(data);
 
@@ -46,7 +45,7 @@ exports.getuserDetails = async (req, res) => {
         crew.gender,
         crew.mobile_no,
         crew.nationality,
-        DATE_FORMAT(spot.created_on, '%Y-%m-%d') AS created_on
+        DATE_FORMAT(crew.created_on, '%d %b %Y') AS created_on
       FROM
         expensetracker_t_crew_m AS crew
       LEFT JOIN
@@ -138,7 +137,7 @@ exports.findOne = async (req, res) => {
         crew.gender,
         crew.mobile_no,
         crew.nationality,
-        DATE_FORMAT(spot.created_on, '%Y-%m-%d') AS created_on
+        DATE_FORMAT(crew.created_on, '%d %b %Y') AS created_on
       FROM
         expensetracker_t_crew_m AS crew
       LEFT JOIN
