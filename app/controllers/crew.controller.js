@@ -17,6 +17,7 @@ exports.createcrew = async (req, res) => {
       sub_category_id: req.body.sub_category_id,
       mobile_no: req.body.mobile_no,
       movie_id: req.body.movie_id,
+      spot_id:req.body.spot_id,
       nationality: req.body.nationality,
       gender: req.body.gender, 
     };
@@ -37,7 +38,11 @@ exports.getuserDetails = async (req, res) => {
     const query = `
       SELECT
         crew.crew_id,
+        crew.movie_id,
+        crew.category_id,
+        crew.sub_category_id,
         movie.movie_name,
+        crew.spot_id,
         spot.location,
         category.category_name,
         sub_category.sub_category_name,
@@ -49,15 +54,15 @@ exports.getuserDetails = async (req, res) => {
       FROM
         expensetracker_t_crew_m AS crew
       LEFT JOIN
-        expensetracker_t_shootingspot_m AS spot ON crew.movie_id = spot.movie_id
+        expensetracker_t_shootingspot_m AS spot ON crew.spot_id = spot.spot_id
       LEFT JOIN
-        expensetracker_t_movie_m AS movie ON spot.movie_id = movie.movie_id
+        expensetracker_t_movie_m AS movie ON crew.movie_id = movie.movie_id
       LEFT JOIN
         expensetracker_t_category_m AS category ON crew.category_id = category.category_id
       LEFT JOIN
         expensetracker_t_subcategory_m AS sub_category ON crew.sub_category_id = sub_category.sub_category_id
       WHERE
-        crew.active_status = 1 AND crew.delete_status = 0;
+      crew.delete_status = 0;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -129,7 +134,12 @@ exports.findOne = async (req, res) => {
     const crew_id = req.params.crew_id;
     const query = `
       SELECT
+        crew.crew_id,
+        crew.movie_id,
+        crew.category_id,
+        crew.sub_category_id,
         movie.movie_name,
+        crew.spot_id,
         spot.location,
         category.category_name,
         sub_category.sub_category_name,
@@ -141,7 +151,7 @@ exports.findOne = async (req, res) => {
       FROM
         expensetracker_t_crew_m AS crew
       LEFT JOIN
-        expensetracker_t_shootingspot_m AS spot ON crew.movie_id = spot.movie_id
+        expensetracker_t_shootingspot_m AS spot ON crew.spot_id = spot.spot_id
       LEFT JOIN
         expensetracker_t_movie_m AS movie ON crew.movie_id = movie.movie_id
       LEFT JOIN
@@ -149,7 +159,7 @@ exports.findOne = async (req, res) => {
       LEFT JOIN
         expensetracker_t_subcategory_m AS sub_category ON crew.sub_category_id = sub_category.sub_category_id
       WHERE
-        crew.active_status = 1 AND crew.crew_id = :crew_id AND crew.delete_status = 0;
+      crew.delete_status = 0 AND crew.crew_id = :crew_id 
     `;
 
     const response = await db.sequelize.query(query, {
@@ -174,6 +184,7 @@ exports.update = async (req, res) => {
       category_id,
       sub_category_id,
       movie_id,
+      spot_id,
       gender,
       mobile_no,
       nationality,
@@ -191,6 +202,7 @@ exports.update = async (req, res) => {
       category_id,
       sub_category_id,
       movie_id,
+      spot_id,
       gender,
       mobile_no,
       nationality,

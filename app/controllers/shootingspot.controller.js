@@ -44,7 +44,7 @@ FROM
     expensetracker_t_shootingspot_m s
 LEFT JOIN 
     expensetracker_t_movie_m m ON s.movie_id = m.movie_id
-    WHERE s.active_status = 1 AND s.delete_status = 0`;
+    WHERE s.delete_status = 0`;
 
     const response = await db.sequelize.query(query, {
       type: QueryTypes.SELECT,
@@ -78,7 +78,7 @@ exports.findOnespot = async (req, res) => {
       LEFT JOIN
         expensetracker_t_movie_m m ON s.movie_id = m.movie_id
       WHERE
-        s.active_status = 1 AND s.delete_status = 0
+        s.delete_status = 0
         AND s.spot_id = :spot_id`;
 
     const response = await db.sequelize.query(query, {

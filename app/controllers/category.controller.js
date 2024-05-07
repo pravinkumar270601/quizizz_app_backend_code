@@ -30,7 +30,7 @@ exports.getUserDetails = async (req, res) => {
       SELECT c.category_id,c.movie_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on, m.movie_name
       FROM expensetracker_t_category_m AS c
       LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
-      WHERE c.delete_status = 0 AND c.active_status = 1;
+      WHERE c.delete_status = 0 ;
     `;
 
     const response = await db.sequelize.query(query, {
@@ -50,10 +50,10 @@ exports.findOne = async (req, res) => {
   try {
     const id = req.params.id;
     const query = `
-      SELECT c.category_id,c.movie_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on
+      SELECT c.category_id,c.movie_id, c.category_name, DATE_FORMAT(c.created_on, '%d %b %Y') AS created_on, m.movie_name
       FROM expensetracker_t_category_m AS c
       LEFT JOIN expensetracker_t_movie_m AS m ON c.movie_id = m.movie_id
-      WHERE c.category_id =${id} AND c.active_status = 1 AND c.delete_status=0;
+      WHERE c.category_id =${id} AND c.delete_status=0;
     `;
 
     // const response = await db.sequelize.query(query, {

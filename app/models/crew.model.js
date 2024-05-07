@@ -18,7 +18,14 @@ module.exports = (sequelize, Sequelize) => {
       },
       allowNull: false,
     },
-
+    spot_id: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: "expensetracker_t_shootingspot_m",
+        key: "spot_id",
+      },
+      allowNull: false,
+    },
     sub_category_id: {
       type: Sequelize.INTEGER,
       references: {
