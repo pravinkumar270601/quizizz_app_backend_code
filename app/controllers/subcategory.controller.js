@@ -62,27 +62,19 @@ exports.findOne = async (req, res) => {
       replacements: { sub_category_id: sub_category_id },
     });
 
-    if (response.length > 0) {
-      res.status(StatusCode.OK.code).send({
-        message: MESSAGE.SUCCESS,
-        data: response[0], // Assuming you only expect one result
-      });
-    } else {
-      res.status(404).send({
-        message: `Cannot find subcategory with id=${id}.`,
-      });
-    }
+    RESPONSE.Success.Message = MESSAGE.SUCCESS;
+    RESPONSE.Success.data = response;
+    res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
-    res.status(StatusCode.SERVER_ERROR.code).send({
-      message: error.message,
-    });
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
 
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
-    const { sub_category_name, movie_id } = req.body; // Remove created_on from the request body
+    const { category_id,sub_category_name, movie_id } = req.body; // Remove created_on from the request body
     const subcategory = await subcategorytable.findByPk(id);
     if (!subcategory) {
       return res
@@ -90,6 +82,7 @@ exports.update = async (req, res) => {
         .send({ message: `Subcategory with id=${id} not found.` });
     }
     await subcategory.update({
+      category_id,
       sub_category_name,
       movie_id,
       // Add created_on with current timestamp directly to the updateData object

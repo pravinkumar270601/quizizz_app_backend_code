@@ -34,7 +34,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       allowNull: true,
     },
-
     movie_id: {
       type: Sequelize.INTEGER,
       references: {

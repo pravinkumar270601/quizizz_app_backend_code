@@ -79,12 +79,7 @@ exports.findOne = (req, res) => {
       attributes: [
         "movie_id",
         "movie_name",
-        [
-          Sequelize.literal(
-            `CASE WHEN active_status = 1 THEN 'Active' ELSE 'Inactive' END`
-          ),
-          "status",
-        ],
+        "active_status",
         "created_on",
       ],
     })
