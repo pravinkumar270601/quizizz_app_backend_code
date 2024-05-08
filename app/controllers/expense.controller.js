@@ -112,8 +112,13 @@ exports.getExpenseById = async (req, res) => {
 exports.updateExpense = async (req, res) => {
   try {
     // Update expense
-    const expense_id = req.params.expense_id;
-    const schedule_id = req.body.schedule_id;
+     const movie_id= req.body.movie_id;
+    const spot_id= req.body.spot_id;
+     const category_id= req.body.category_id;
+      const sub_category_id= req.body.sub_category_id;
+      const crew_id= req.body.crew_id;
+      const schedule_id = req.body.schedule_id;
+      const expense_id =req.body.expense_id;
     const updateData = {
       advance_amount: req.body.advance_amount,
       beta: req.body.beta,
