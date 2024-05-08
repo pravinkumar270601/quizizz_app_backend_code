@@ -47,7 +47,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: true,
     },
     mobile_no: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       allowNull: true,
     },
     gender: {
