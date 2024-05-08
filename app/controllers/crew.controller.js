@@ -21,6 +21,7 @@ exports.createcrew = async (req, res) => {
       nationality: req.body.nationality,
       gender: req.body.gender, 
     };
+    
     const response = await crewtable.create(data);
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -47,7 +48,12 @@ exports.getuserDetails = async (req, res) => {
         category.category_name,
         sub_category.sub_category_name,
         crew.crew_name,
-        crew.gender,
+        CASE
+            WHEN crew.gender = 1 THEN 'Male'
+            WHEN crew.gender = 2 THEN 'Female'
+            WHEN crew.gender = 3 THEN 'Others'
+            ELSE 'Unknown'
+        END AS gender,
         crew.mobile_no,
         crew.nationality,
         DATE_FORMAT(crew.created_on, '%d %b %Y') AS created_on
@@ -62,9 +68,10 @@ exports.getuserDetails = async (req, res) => {
       LEFT JOIN
         expensetracker_t_subcategory_m AS sub_category ON crew.sub_category_id = sub_category.sub_category_id
       WHERE
-      crew.delete_status = 0;
+        crew.delete_status = 0;
     `;
 
+    
     const response = await db.sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
