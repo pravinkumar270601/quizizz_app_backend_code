@@ -87,9 +87,22 @@ exports.getuserDetails = async (req, res) => {
 
 exports.getSubcategoryDropdown = async (req, res) => {
   try {
+    // Assuming category_id is provided in the request body or query parameters
+    const category_id = req.body.category_id
+    const movie_id = req.body.movie_id 
+
+    // Ensure category_id is provided
+    if (!category_id) {
+      throw new Error("Category ID is required");
+    }
+
     const subcategories = await subcategory.findAll({
       attributes: {
         exclude: ["category_id", "movie_id", "active_status", "delete_status"],
+      },
+      where: {
+        category_id: category_id,
+        movie_id:movie_id, // Filter subcategories by the specified category_id
       },
     });
 
@@ -109,16 +122,26 @@ exports.getSubcategoryDropdown = async (req, res) => {
 
 exports.getshootingspotDropdown = async (req, res) => {
   try {
+    // Assuming movie_id is provided in the request body or query parameters
+    const movie_id = req.body.movie_id ;
+
+    // Ensure movie_id is provided
+    if (!movie_id) {
+      throw new Error("Movie ID is required");
+    }
+
     const shootingspots = await shootingSpot.findAll({
       attributes: {
         exclude: [
           "contact_no",
-          "movie_id",
           "active_status",
           "delete_status",
           "created_on",
           "updated_on",
         ],
+      },
+      where: {
+        movie_id: movie_id, // Filter shooting spots by the specified movie_id
       },
     });
 
@@ -135,6 +158,7 @@ exports.getshootingspotDropdown = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 exports.findOne = async (req, res) => {
   try {

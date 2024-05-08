@@ -176,12 +176,19 @@ exports.deleteExpenseAndSchedule = async (req, res) => {
 
 exports.getCrewDropDown = async (req, res) => {
   try {
+    // Assuming movie_id is provided in the request body or query parameters
+    const movie_id = req.body.movie_id ;
+
+    // Ensure movie_id is provided
+    if (!movie_id) {
+      throw new Error("Movie ID is required");
+    }
+
     const crews = await crewtable.findAll({
       attributes: {
         exclude: [
           "category_id",
           "sub_category_id",
-          "movie_id",
           "nationality",
           "gender",
           "mobile_no",
@@ -192,16 +199,24 @@ exports.getCrewDropDown = async (req, res) => {
         ],
       },
       where: {
+        movie_id: movie_id, // Filter crews by the specified movie_id
         active_status: 1,
         delete_status: 0,
       },
     });
 
+    // Extract only crew_name from the crew objects
+    const crewNames = crews.map((crew) => ({
+      crew_id: crew.crew_id,
+      crew_name: crew.crew_name,
+    }));
+
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = crews;
+    RESPONSE.Success.data = crewNames;
     res.status(StatusCode.OK.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+

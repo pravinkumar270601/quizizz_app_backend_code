@@ -30,7 +30,7 @@ router.put("/updateSubCategory/:id", subcategory.update);
 
 router.delete("/deleteSubCategory/:id", subcategory.delete);
 
-router.get("/dropdownCategory", subcategory.getCategoryDropdown);
+router.post("/dropdownCategory", subcategory.getCategoryDropdown);
 
 //crew
 router.post("/createCrew", crew.createcrew);
@@ -39,9 +39,9 @@ router.get("/getCrewDetails", crew.getuserDetails);
 
 router.get("/getCrewUserById/:crew_id", crew.findOne);
 
-router.get("/getSubCategoryDropdown", crew.getSubcategoryDropdown);
+router.post("/getSubCategoryDropdown", crew.getSubcategoryDropdown);
 
-router.get("/getCrewshootingDetails", crew.getshootingspotDropdown);
+router.post("/getCrewshootingDetails", crew.getshootingspotDropdown);
 
 router.put("/updateCrew/:id", crew.update);
 
@@ -94,6 +94,6 @@ router.put("/updateExpense/:expense_id", expense.updateExpense);
 
 router.delete("/deleteExpense/:expense_id/:schedule_id", expense.deleteExpenseAndSchedule);
 
-router.get("/getCrewDropDown", expense.getCrewDropDown);
+router.post("/getCrewDropDown", expense.getCrewDropDown);
 
 module.exports = router;

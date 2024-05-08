@@ -62,12 +62,20 @@ exports.findOne = async (req, res) => {
       replacements: { sub_category_id: sub_category_id },
     });
 
-    RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = response;
-    res.status(StatusCode.OK.code).send(RESPONSE.Success);
+    if (response.length > 0) {
+      res.status(StatusCode.OK.code).send({
+        message: MESSAGE.SUCCESS,
+        data: response[0], // Assuming you only expect one result
+      });
+    } else {
+      res.status(404).send({
+        message: `Cannot find subcategory with id=${id}.`,
+      });
+    }
   } catch (error) {
-    RESPONSE.Failure.Message = error.message;
-    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+    res.status(StatusCode.SERVER_ERROR.code).send({
+      message: error.message,
+    });
   }
 };
 
@@ -82,7 +90,6 @@ exports.update = async (req, res) => {
         .send({ message: `Subcategory with id=${id} not found.` });
     }
     await subcategory.update({
-      category_id,
       sub_category_name,
       movie_id,
       // Add created_on with current timestamp directly to the updateData object
@@ -121,17 +128,20 @@ exports.delete = async (req, res) => {
 
 exports.getCategoryDropdown = async (req, res) => {
   try {
+    // Assuming movie_id is provided in the request body or query parameters
+    const movie_id = req.body.movie_id || req.query.movie_id;
+
+    // Ensure movie_id is provided
+    if (!movie_id) {
+      throw new Error("Movie ID is required");
+    }
+
     const categories = await categorytable.findAll({
       attributes: {
-        exclude: [
-          "movie_id",
-          "created_on",
-          "updated_on",
-          "active_status",
-          "delete_status",
-        ],
+        exclude: ["created_on", "updated_on", "active_status", "delete_status"],
       },
       where: {
+        movie_id: movie_id, // Filter categories by the specified movie_id
         active_status: 1,
         delete_status: 0,
       },

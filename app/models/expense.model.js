@@ -48,6 +48,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       allowNull: false,
     },
+    date_of_shooting:{
+      type: Sequelize.DATEONLY,
+      allowNull:false
+
+    },
     advance_amount: {
       type: Sequelize.INTEGER,
       allowNull: false,
