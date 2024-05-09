@@ -6,6 +6,14 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
+    expense_id: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: "expensetracker_t_expense_t",
+        key: "expense_id",
+      },
+      allowNull: false,
+    },
     movie_id: {
       type: Sequelize.INTEGER,
       references: {

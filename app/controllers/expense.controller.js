@@ -31,14 +31,14 @@ exports.createExpense = async (req, res) => {
       date_of_shooting: req.body.date_of_shooting,
     };
     const expenseEntry = await expense.create(expenseData);
+    console.log('expenseEntry', expenseEntry);
 
     // Create movie schedule
     const shootingData = {
       movie_id: req.body.movie_id,
       spot_id: req.body.spot_id,
-      // category_id:req.body.category_id,
-      // sub_category_id: req.body.sub_category_id,
-      // crew_id:req.bod
+      date_of_shooting: req.body.date_of_shooting,
+      expense_id: expenseEntry?.expense_id
     };
     const scheduleEntry = await movieschedule.create(shootingData);
 
@@ -116,17 +116,19 @@ exports.getExpenseById = async (req, res) => {
 exports.updateExpense = async (req, res) => {
   try {
     // Update expense
-     const movie_id= req.body.movie_id;
-    const spot_id= req.body.spot_id;
-     const category_id= req.body.category_id;
-      const sub_category_id= req.body.sub_category_id;
-      const crew_id= req.body.crew_id;
-      const schedule_id = req.body.schedule_id;
-      const expense_id =req.body.expense_id;
+    const expense_id = req.params.expense_id
+     
     const updateData = {
+      movie_id: req.body.movie_id,
+      spot_id: req.body.spot_id,
+      category_id: req.body.category_id,
+      sub_category_id: req.body.sub_category_id,
+      crew_id: req.body.crew_id,
       advance_amount: req.body.advance_amount,
       beta: req.body.beta,
       no_of_staffs: req.body.no_of_staffs,
+      date_of_shooting: req.body.date_of_shooting,
+
       // Remove updated_on from the updateData object
     };
     // Add updated_on with current timestamp directly to the updateData object
@@ -138,10 +140,12 @@ exports.updateExpense = async (req, res) => {
 
     // Update movie schedule
     const shootingData = {
+      movie_id: req.body.movie_id,
+      spot_id: req.body.spot_id,
       date_of_shooting: req.body.date_of_shooting,
     };
     const result = await movieschedule.update(shootingData, {
-      where: { schedule_id: schedule_id },
+      where: { expense_id: expense_id },
     });
 
     RESPONSE.Success.Message = MESSAGE.UPDATE;
