@@ -92,7 +92,7 @@ router.get("/getExpenseById/:expense_id", expense.getExpenseById);
 
 router.put("/updateExpense/:expense_id", expense.updateExpense);
 
-router.delete("/deleteExpense/:expense_id/:schedule_id", expense.deleteExpenseAndSchedule);
+router.delete("/deleteExpense/:expense_id", expense.deleteExpenseAndSchedule);
 
 router.post("/getCrewDropDown", expense.getCrewDropDown);
 

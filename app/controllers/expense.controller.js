@@ -162,13 +162,18 @@ exports.updateExpense = async (req, res) => {
 exports.deleteExpenseAndSchedule = async (req, res) => {
   try {
     //const { expense_id, schedule_id } = req.params;
-    const expenseData = { delete_status: 1 };
+    
     const scheduleData = { delete_status: 1 };
     const expense_id = req.params.expense_id;
-    const schedule_id = req.params.schedule_id;
+    const expenseData = { delete_status: 1 };
+   // const schedule_id = req.params.schedule_id;
 
     // Delete expense
-    const expenses = await expense.findByPk(expense_id);
+    const expenses = await expense.findAll({
+      where: {
+        expense_id: expense_id
+  }
+  });
     if (!expenses) {
       return res.status(404).json({ error: "Expense not found" });
     }
@@ -177,12 +182,16 @@ exports.deleteExpenseAndSchedule = async (req, res) => {
     });
 
     // Delete movie schedule
-    const movieSchedule = await movieschedule.findByPk(schedule_id);
+    const movieSchedule = await movieschedule.findAll({
+      where: {
+        expense_id: expense_id,
+      },
+    });
     if (!movieSchedule) {
       return res.status(404).json({ error: "Movie schedule not found" });
     }
-    const result = await movieSchedule.update(scheduleData, {
-      where: { schedule_id: schedule_id },
+    const result = await movieschedule.update(scheduleData, {
+      where: { expense_id: expense_id },
     });
 
     RESPONSE.Success.Message = MESSAGE.DELETE;
