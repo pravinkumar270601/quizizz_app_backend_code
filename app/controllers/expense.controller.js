@@ -89,7 +89,7 @@ exports.getExpenseById = async (req, res) => {
   try {
     const expense_id = req.params.expense_id;
     const query = `
-    SELECT e.expense_id,m.movie_id,s.spot_id,e.date_of_shooting,c.crew_name,cat.category_name,sub.sub_category_name,e.no_of_staffs,e.advance_amount,e.beta FROM expensetracker_t_expense_t as e 
+    SELECT e.expense_id,m.movie_id,s.spot_id,e.date_of_shooting,c.crew_id,cat.category_id,sub.sub_category_id,e.no_of_staffs,e.advance_amount,e.beta FROM expensetracker_t_expense_t as e 
     left join expensetracker_t_movie_m as m on e.movie_id=m.movie_id 
     left join expensetracker_t_shootingspot_m as s on e.spot_id = s.spot_id
     left join expensetracker_t_movieschedule_t as sch on e.spot_id=sch.spot_id
