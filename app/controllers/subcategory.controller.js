@@ -90,6 +90,7 @@ exports.update = async (req, res) => {
         .send({ message: `Subcategory with id=${id} not found.` });
     }
     await subcategory.update({
+      category_id,
       sub_category_name,
       movie_id,
       // Add created_on with current timestamp directly to the updateData object
