@@ -17,8 +17,6 @@ exports.createcrew = async (req, res) => {
       sub_category_id: req.body.sub_category_id,
       mobile_no: req.body.mobile_no,
       movie_id: req.body.movie_id,
-      spot_id:req.body.spot_id,
-      nationality: req.body.nationality,
       gender: req.body.gender, 
     };
     
@@ -43,8 +41,6 @@ exports.getuserDetails = async (req, res) => {
         crew.category_id,
         crew.sub_category_id,
         movie.movie_name,
-        crew.spot_id,
-        spot.location,
         category.category_name,
         sub_category.sub_category_name,
         crew.crew_name,
@@ -55,12 +51,9 @@ exports.getuserDetails = async (req, res) => {
             ELSE 'Unknown'
         END AS gender,
         crew.mobile_no,
-        crew.nationality,
         DATE_FORMAT(crew.created_on, '%d %b %Y') AS created_on
       FROM
         expensetracker_t_crew_m AS crew
-      LEFT JOIN
-        expensetracker_t_shootingspot_m AS spot ON crew.spot_id = spot.spot_id
       LEFT JOIN
         expensetracker_t_movie_m AS movie ON crew.movie_id = movie.movie_id
       LEFT JOIN
@@ -170,19 +163,14 @@ exports.findOne = async (req, res) => {
         crew.category_id,
         crew.sub_category_id,
         movie.movie_name,
-        crew.spot_id,
-        spot.location,
         category.category_name,
         sub_category.sub_category_name,
         crew.crew_name,
         crew.gender,
         crew.mobile_no,
-        crew.nationality,
         DATE_FORMAT(crew.created_on, '%d %b %Y') AS created_on
       FROM
         expensetracker_t_crew_m AS crew
-      LEFT JOIN
-        expensetracker_t_shootingspot_m AS spot ON crew.spot_id = spot.spot_id
       LEFT JOIN
         expensetracker_t_movie_m AS movie ON crew.movie_id = movie.movie_id
       LEFT JOIN
@@ -215,10 +203,8 @@ exports.update = async (req, res) => {
       category_id,
       sub_category_id,
       movie_id,
-      spot_id,
       gender,
       mobile_no,
-      nationality,
     } = req.body;
     const crew = await crewtable.findByPk(crew_id);
     if (!crew) {
@@ -233,10 +219,8 @@ exports.update = async (req, res) => {
       category_id,
       sub_category_id,
       movie_id,
-      spot_id,
       gender,
       mobile_no,
-      nationality,
       updated_on: defaultUpdatedOn, // Add updated_on field with default value
     });
 

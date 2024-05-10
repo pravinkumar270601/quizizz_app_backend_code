@@ -18,14 +18,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       allowNull: false,
     },
-    spot_id: {
-      type: Sequelize.INTEGER,
-      references: {
-        model: "expensetracker_t_shootingspot_m",
-        key: "spot_id",
-      },
-      allowNull: false,
-    },
     sub_category_id: {
       type: Sequelize.INTEGER,
       references: {
@@ -40,10 +32,6 @@ module.exports = (sequelize, Sequelize) => {
         model: "expensetracker_t_movie_m",
         key: "movie_id",
       },
-      allowNull: true,
-    },
-    nationality: {
-      type: Sequelize.STRING,
       allowNull: true,
     },
     mobile_no: {
