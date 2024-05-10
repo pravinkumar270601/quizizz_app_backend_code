@@ -18,6 +18,7 @@ exports.createcrew = async (req, res) => {
       mobile_no: req.body.mobile_no,
       movie_id: req.body.movie_id,
       gender: req.body.gender, 
+      created_on: new Date()
     };
     
     const response = await crewtable.create(data);

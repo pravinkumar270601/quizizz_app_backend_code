@@ -29,6 +29,7 @@ exports.createExpense = async (req, res) => {
       no_of_staffs: req.body.no_of_staffs,
       created_on: req.body.created_on,
       date_of_shooting: req.body.date_of_shooting,
+      created_on : new date()
     };
     const expenseEntry = await expense.create(expenseData);
     console.log('expenseEntry', expenseEntry);

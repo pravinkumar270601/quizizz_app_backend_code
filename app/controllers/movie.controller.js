@@ -22,6 +22,7 @@ exports.create = async (req, res) => {
     const data = {
       movie_name: req.body.movie_name,
       active_status: req.body.active_status,
+      created_on: new Date()
     };
 
     const response = await movietable.create(data);

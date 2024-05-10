@@ -14,7 +14,7 @@ exports.create = async (req, res) => {
       sub_category_name: req.body.sub_category_name,
       category_id: req.body.category_id,
       movie_id: req.body.movie_id,
-      created_on: new Date().toISOString().slice(0, 10), // Change to YYYY-MM-DD format
+      created_on: new Date()// Change to YYYY-MM-DD format
     };
     const response = await subcategorytable.create(data);
 

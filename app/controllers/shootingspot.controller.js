@@ -14,7 +14,7 @@ exports.createSpot = async (req, res) => {
       contact_no: req.body.contact_no,
       location: req.body.location,
       active_status: req.body.active_status,
-      created_on: req.body.created_on,
+      created_on: new Date()
     };
     const response = await expense.create(data);
 

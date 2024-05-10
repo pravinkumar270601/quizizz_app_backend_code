@@ -11,6 +11,7 @@ exports.create = async (req, res) => {
     const data = {
       category_name: req.body.category_name,
       movie_id: req.body.movie_id,
+      created_on: new Date()
     };
 
     const response = await categorytable.create(data);
