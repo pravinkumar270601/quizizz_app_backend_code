@@ -55,7 +55,10 @@ exports.getUserDetails = async (req, res) => {
           ),
           "status",
         ],
-        "created_on",
+        [
+          Sequelize.literal('DATE_FORMAT(created_on, "%d %b %Y")'),
+          "formatted_created_on",
+        ],
       ],
     });
 
