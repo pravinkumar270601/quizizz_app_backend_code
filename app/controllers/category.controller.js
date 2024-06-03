@@ -8,22 +8,29 @@ const { StatusCode } = require("../constants/HttpStatusCode");
 
 exports.create = async (req, res) => {
   try {
-    const data = {
-      category_name: req.body.category_name,
-      movie_id: req.body.movie_id,
-      created_on: new Date()
-    };
+    const categoryNames = req.body.category_names; // Assuming category_names is an array of objects [{ name: 'avb' }, { name: 'bchbd' }, { name: 'ajhbd' }]
+    const createdCategories = [];
 
-    const response = await categorytable.create(data);
+    for (const categoryData of categoryNames) {
+      const data = {
+        category_name: categoryData.name,
+        movie_id: req.body.movie_id,
+        created_on: new Date(),
+      };
+
+      const response = await categorytable.create(data);
+      createdCategories.push({ category_id: response.category_id });
+    }
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = { category_id: response.category_id };
+    RESPONSE.Success.data = createdCategories;
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 exports.getUserDetails = async (req, res) => {
   try {

@@ -10,22 +10,31 @@ const { StatusCode } = require("../constants/HttpStatusCode");
 
 exports.create = async (req, res) => {
   try {
-    const data = {
-      sub_category_name: req.body.sub_category_name,
-      category_id: req.body.category_id,
-      movie_id: req.body.movie_id,
-      created_on: new Date()// Change to YYYY-MM-DD format
-    };
-    const response = await subcategorytable.create(data);
+    const category_id = req.body.category_id;
+    const movie_id = req.body.movie_id;
+    const subCategoryNames = req.body.sub_category_names; // Assuming sub_category_names is an array of objects [{ name: 'sub_category1' }, { name: 'sub_category2' }, { name: 'sub_category3' }]
+    const createdSubCategories = [];
+
+    for (const subCategoryData of subCategoryNames) {
+      const data = {
+        sub_category_name: subCategoryData.name,
+        category_id: category_id,
+        movie_id: movie_id,
+        created_on: new Date().toISOString().slice(0, 10), // Change to YYYY-MM-DD format
+      };
+      const response = await subcategorytable.create(data);
+      createdSubCategories.push({ sub_category_id: response.sub_category_id });
+    }
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = { sub_category_id: response.sub_category_id };
+    RESPONSE.Success.data = createdSubCategories;
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 exports.getUserDetails = async (req, res) => {
   try {

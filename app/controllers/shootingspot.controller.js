@@ -9,19 +9,26 @@ const { QueryTypes } = require("sequelize");
 // Create and save new movie spot
 exports.createSpot = async (req, res) => {
   try {
-    const data = {
-      movie_id: req.body.movie_id,
-      contact_no: req.body.contact_no,
-      location: req.body.location,
-      active_status: req.body.active_status,
-      created_on: new Date()
-    };
-    const response = await expense.create(data);
+    const movie_id = req.body.movie_id;
+    const contact_no = req.body.contact_no;
+    const locations = req.body.locations; // Assuming locations is an array of objects [{ name: 'location1' }, { name: 'location2' }, { name: 'location3' }]
+    const active_status = req.body.active_status;
+    const createdSpots = [];
+
+    for (const locationData of locations) {
+      const data = {
+        movie_id: movie_id,
+        contact_no: contact_no,
+        location: locationData.name,
+        active_status: active_status,
+        created_on: new Date(),
+      };
+      const response = await expense.create(data);
+      createdSpots.push({ spot_id: response.spot_id });
+    }
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = {
-      spot_id: response.spot_id,
-    };
+    RESPONSE.Success.data = createdSpots;
     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
   } catch (err) {
     RESPONSE.Failure.Message = StatusCode.SERVER_ERROR.message;
@@ -29,6 +36,7 @@ exports.createSpot = async (req, res) => {
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
+
 
 // Retrieve all spot details from the database.
 exports.getspotDetails = async (req, res) => {
