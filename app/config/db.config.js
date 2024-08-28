@@ -2,7 +2,7 @@ module.exports = {
   HOST: "localhost",
   USER: "root",
   PASSWORD: "",
-  DB: "d_expensetracker_mysql_db",
+  DB: "d_quizizz_app_mysql_db",
   dialect: "mysql",
   pool: {
     max: 5,

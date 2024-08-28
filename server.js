@@ -1,13 +1,17 @@
+
+
 const express = require("express");
 const cors = require("cors");
-
+// const morgan = require("morgan");
+const bodyParser = require("body-parser");
 const app = express();
+const path = require("path");
 
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
+// require("dotenv").config();
 
-// app.use(cors(corsOptions));
+// var corsOptions = {
+//   origin: "http://localhost:8081"
+// };
 app.use(
   cors({
     origin: "*",
@@ -42,6 +46,8 @@ app.get("/", (req, res) => {
 const routes = require("./app/routes/routes")
 app.use("/api/v1", routes);
 
+app.use('/api/v1/uploads',express.static('uploads'))
+// require("./app/routes/user.routes.js")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 4000;

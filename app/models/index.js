@@ -24,13 +24,11 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
-db.expensetracker_t_category_m = require("./category.model.js")(sequelize, Sequelize);
-db.expensetracker_t_subcategory_m = require("./subcategory.model.js")(sequelize, Sequelize);
-db.expensetracker_t_crew_m = require("./crew.model.js")(sequelize, Sequelize);
-db.expensetracker_t_movie_m = require("./movie.model.js")(sequelize, Sequelize);
-db.expensetracker_t_movieschedule_t = require("./movieschedule.model.js")(sequelize,Sequelize);
-db.expensetracker_t_shootingspot_m = require("./shootingspot.model.js")(sequelize, Sequelize);
-db.expensetracker_t_expense_t = require("./expense.model.js")(sequelize, Sequelize);
+db.quiz_question_answers = require("./question_answer.model.js")(sequelize, Sequelize)
+db.publish = require("./publish.model.js")(sequelize, Sequelize)
+db.user = require("./user.model.js")(sequelize, Sequelize)
+// Establish relationships
+
 
 module.exports = db;
 
