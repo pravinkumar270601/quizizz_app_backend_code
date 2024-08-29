@@ -1,7 +1,8 @@
 const Sequelize = require("sequelize");
 const db = require("../models");
+const User = db.users;
 
-const PublishTable = db.publish;
+const PublishTable = db.publishs;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -16,8 +17,23 @@ exports.PublishTableCreate = async (req, res) => {
       grade: req.body.grade,
       language: req.body.language,
       visibilityType: req.body.visibilityType,
-      imageUrl: req.body.image,
+      imageUrl: req.body.imageUrl,
+      user_id: req.body.user_id,
     };
+    // const {user_id } = req.body;
+    if (!data.user_id) {
+      return res.status(400).send({ message: "User ID is required" });
+    }
+    // Check if the user already has a publish entry
+    const existingPublish = await PublishTable.findOne({
+      where: { user_id: data.user_id },
+    });
+
+    if (existingPublish) {
+      return res
+        .status(400)
+        .send({ message: "User already has a publish entry" });
+    }
 
     const response = await PublishTable.create(data);
 
@@ -34,6 +50,7 @@ exports.PublishTableCreate = async (req, res) => {
 
 exports.getAllPublish = async (req, res) => {
   try {
+    // const user_id = req.params.user_id;
     const response = await PublishTable.findAll();
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -47,17 +64,17 @@ exports.getAllPublish = async (req, res) => {
 
 // Find a single publish with a publish_id
 
-exports.getPublishById = async (req, res) => {
+exports.getPublishByUserId = async (req, res) => {
   try {
-    const id = req.params.id;
-    const response = await PublishTable.findByPk(id);
+    const id = req.params.user_id;
+    const response = await PublishTable.findOne({ where: { user_id:id } });
 
     if (response) {
       RESPONSE.Success.Message = MESSAGE.SUCCESS;
       RESPONSE.Success.data = response;
       res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
     } else {
-      res.status(404).send({ message: `Cannot find Question with id=${id}.` });
+      res.status(404).send({ message: `Cannot find publish with id=${id}.` });
     }
   } catch (error) {
     RESPONSE.Failure.Message = err.message;
@@ -71,10 +88,11 @@ exports.updatepublishById = async (req, res) => {
   try {
     const id = req.params.id;
     const [updated] = await PublishTable.update(req.body, {
-      where: { publish_id: id },
+      where: { publish_id : id },
     });
 
     if (updated) {
+      
       const updatedPublish = await PublishTable.findByPk(id);
       RESPONSE.Success.Message = MESSAGE.UPDATE;
       RESPONSE.Success.data = {};
@@ -101,7 +119,7 @@ exports.deletepublishById = async (req, res) => {
       RESPONSE.Success.data = {};
       res.status(200).send(RESPONSE.Success);
     } else {
-      return res.status(404).json({ error: "QuestionAnswers not found" });
+      return res.status(404).json({ error: "publish not found" });
     }
   } catch (error) {
     RESPONSE.Failure.Message = error.message;

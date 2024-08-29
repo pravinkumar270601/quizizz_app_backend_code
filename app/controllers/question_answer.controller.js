@@ -16,6 +16,7 @@ exports.QuestionAnswerscreate = async (req, res) => {
       questionType: req.body.questionType,
       questionPoint: req.body.questionPoint,
       questionTiming: req.body.questionTiming,
+      user_id: req.body.user_id, // Associate with a user
     };
 
     const response = await QuestionAnswersTable.create(data);
@@ -31,13 +32,34 @@ exports.QuestionAnswerscreate = async (req, res) => {
 
 // Retrieve all QuestionAnswers from the database.
 
-exports.getAllQuestionAnswers = async (req, res) => {
-  try {
-    const response = await QuestionAnswersTable.findAll();
+// exports.getAllQuestionAnswers = async (req, res) => {
+//   try {
+//     const response = await QuestionAnswersTable.findAll();
 
-    RESPONSE.Success.Message = MESSAGE.SUCCESS;
-    RESPONSE.Success.data = response;
-    res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+//     RESPONSE.Success.Message = MESSAGE.SUCCESS;
+//     RESPONSE.Success.data = response;
+//     res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+//   } catch (error) {
+//     RESPONSE.Failure.Message = error.message;
+//     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+//   }
+// };
+
+// Retrieve all questions by user ID
+exports.getAllQuestionAnswersByUserId = async (req, res) => {
+  try {
+    const user_id = req.params.user_id;
+    const response = await QuestionAnswersTable.findAll({ where: {user_id} });
+
+    if (response.length > 0) {
+      RESPONSE.Success.Message = MESSAGE.SUCCESS;
+      RESPONSE.Success.data = response;
+      res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+    } else {
+      res
+        .status(404)
+        .send({ message: `No questions found for user_id=${user_id}` });
+    }
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);

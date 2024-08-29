@@ -10,8 +10,8 @@ router.post(
   questionAnswersController.QuestionAnswerscreate
 );
 router.get(
-  "/getAllQuestionAnswers",
-  questionAnswersController.getAllQuestionAnswers
+  "/getAllQuestionAnswersByuser/user/:user_id",
+  questionAnswersController.getAllQuestionAnswersByUserId
 );
 router.get(
   "/getQuestionAnswersById/:id",
@@ -30,7 +30,7 @@ router.delete(
 
 router.post("/publishCreate", publishController.PublishTableCreate);
 router.get("/getAllPublish", publishController.getAllPublish);
-router.get("/getPublishById/:id", publishController.getPublishById);
+router.get("/getPublishByUserId/user/:user_id", publishController.getPublishByUserId);
 router.put("/updatePublishById/:id", publishController.updatepublishById);
 router.delete("/deletePublishId/:id", publishController.deletepublishById);
 

@@ -32,9 +32,11 @@ module.exports = (sequelize, Sequelize) => {
     user_id: {
       type: Sequelize.INTEGER,
       references: {
-        model: 'users',
-        key: 'user_id',
+        model: "user",
+        key: "user_id",
       },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
       allowNull: false,
     },
   });

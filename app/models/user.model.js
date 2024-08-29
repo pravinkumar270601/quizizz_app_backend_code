@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("User", {
+  const User = sequelize.define("user", {
     user_id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
@@ -23,6 +23,6 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
     },
   });
-
+  User.hasMany(sequelize.models.quiz_question_answer, { foreignKey: 'user_id' });
   return User;
 };
