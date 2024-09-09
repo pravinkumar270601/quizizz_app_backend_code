@@ -1,6 +1,8 @@
 const questionAnswersController = require("../controllers/question_answer.controller.js");
 const publishController = require("../controllers/publish.controller.js");
-const imageController = require("../controllers/upload.controller.js");
+const imageController = require("../controllers/upload_image.controller.js");
+const videoController = require("../controllers/upload_video.controller.js");
+const audioController = require("../controllers/upload_audio.controller.js");
 const users = require("../controllers/user.controller.js");
 const router = require("express").Router();
 
@@ -10,8 +12,8 @@ router.post(
   questionAnswersController.QuestionAnswerscreate
 );
 router.get(
-  "/getAllQuestionAnswersByuser/user/:user_id",
-  questionAnswersController.getAllQuestionAnswersByUserId
+  "/getAllQuestionAnswersByPublishId/:publish_id",
+  questionAnswersController.getAllQuestionAnswersByPublishId
 );
 router.get(
   "/getQuestionAnswersById/:id",
@@ -26,19 +28,36 @@ router.delete(
   questionAnswersController.deleteQuestionById
 );
 
+router.get(
+  "/getQuestionsWithoutPublishByUserId/user/:user_id",
+  questionAnswersController.getQuestionsWithoutPublishByUserId
+);
+
+router.delete(
+  "/deleteQuestionsWithoutPublishByUserId/user/:user_id",
+  questionAnswersController.deleteQuestionsWithoutPublishByUserId
+);
+
 // publish router api
 
 router.post("/publishCreate", publishController.PublishTableCreate);
 router.get("/getAllPublish", publishController.getAllPublish);
-router.get("/getPublishByUserId/user/:user_id", publishController.getPublishByUserId);
+router.get("/getPublishById/:publish_id", publishController.getPublishById);
+router.get(
+  "/getPublishByUserId/user/:user_id",
+  publishController.getPublishByUserId
+);
 router.put("/updatePublishById/:id", publishController.updatepublishById);
 router.delete("/deletePublishId/:id", publishController.deletepublishById);
 
 // image uploadImage
 
 router.post("/uploadImage", imageController.uploadImage);
+router.post("/uploadVideo", videoController.uploadVideo);
+router.post("/uploadAudio", audioController.uploadAudio);
 
 // user login
-router.post("/userLogin", users.create);
+router.post("/userSignup", users.create);
+router.post("/userLogin", users.login);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const db = require("../models");
 const User = db.users;
 
 const PublishTable = db.publishs;
+const QuestionAnswersTable = db.quiz_question_answers;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -19,23 +20,45 @@ exports.PublishTableCreate = async (req, res) => {
       visibilityType: req.body.visibilityType,
       imageUrl: req.body.imageUrl,
       user_id: req.body.user_id,
+      question_ids: req.body.question_ids || [],
     };
     // const {user_id } = req.body;
     if (!data.user_id) {
       return res.status(400).send({ message: "User ID is required" });
     }
-    // Check if the user already has a publish entry
-    const existingPublish = await PublishTable.findOne({
-      where: { user_id: data.user_id },
-    });
-
-    if (existingPublish) {
+    if (!data.question_ids || data.question_ids.length === 0) {
       return res
         .status(400)
-        .send({ message: "User already has a publish entry" });
+        .send({ message: "At least one question ID is required" });
+    }
+    // Check if the user exists
+    const existingUser = await User.findByPk(data.user_id);
+
+    if (!existingUser) {
+      return res.status(400).send({ message: "User does not exist" });
+    }
+
+    // Check if all question IDs belong to the same user
+    const userQuestions = await QuestionAnswersTable.findAll({
+      where: {
+        question_id: data.question_ids,
+        user_id: data.user_id,
+      },
+    });
+
+    if (userQuestions.length !== data.question_ids.length) {
+      return res.status(400).send({
+        message: "One or more question IDs do not belong to the specified user",
+      });
     }
 
     const response = await PublishTable.create(data);
+
+    // Update quiz_question_answer entries with the new publish_id
+    await QuestionAnswersTable.update(
+      { publish_id: response.publish_id },
+      { where: { question_id: data.question_ids } }
+    );
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
     RESPONSE.Success.data = { publish_id: response.publish_id };
@@ -50,7 +73,6 @@ exports.PublishTableCreate = async (req, res) => {
 
 exports.getAllPublish = async (req, res) => {
   try {
-    // const user_id = req.params.user_id;
     const response = await PublishTable.findAll();
 
     RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -64,10 +86,10 @@ exports.getAllPublish = async (req, res) => {
 
 // Find a single publish with a publish_id
 
-exports.getPublishByUserId = async (req, res) => {
+exports.getPublishById = async (req, res) => {
   try {
-    const id = req.params.user_id;
-    const response = await PublishTable.findOne({ where: { user_id:id } });
+    const id = req.params.publish_id;
+    const response = await PublishTable.findByPk(id);
 
     if (response) {
       RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -77,7 +99,28 @@ exports.getPublishByUserId = async (req, res) => {
       res.status(404).send({ message: `Cannot find publish with id=${id}.` });
     }
   } catch (error) {
-    RESPONSE.Failure.Message = err.message;
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+  }
+};
+
+
+// Find a publish with a UserId
+
+exports.getPublishByUserId = async (req, res) => {
+  try {
+    const id = req.params.user_id;
+    const response = await PublishTable.findAll({ where: { user_id: id } });
+
+    if (response) {
+      RESPONSE.Success.Message = MESSAGE.SUCCESS;
+      RESPONSE.Success.data = response;
+      res.status(StatusCode.CREATED.code).send(RESPONSE.Success);
+    } else {
+      res.status(404).send({ message: `Cannot find publish with id=${id}.` });
+    }
+  } catch (error) {
+    RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
@@ -88,11 +131,10 @@ exports.updatepublishById = async (req, res) => {
   try {
     const id = req.params.id;
     const [updated] = await PublishTable.update(req.body, {
-      where: { publish_id : id },
+      where: { publish_id: id },
     });
 
     if (updated) {
-      
       const updatedPublish = await PublishTable.findByPk(id);
       RESPONSE.Success.Message = MESSAGE.UPDATE;
       RESPONSE.Success.data = {};
@@ -110,6 +152,12 @@ exports.updatepublishById = async (req, res) => {
 exports.deletepublishById = async (req, res) => {
   try {
     const id = req.params.id;
+
+    // Delete related quiz_question_answer entries
+    await QuestionAnswersTable.destroy({
+      where: { publish_id: id },
+    });
+
     const deleted = await PublishTable.destroy({
       where: { publish_id: id },
     });

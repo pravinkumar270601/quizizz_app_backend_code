@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../models");
+const User = db.users;
 
 const QuestionAnswersTable = db.quiz_question_answers;
 
@@ -11,7 +12,10 @@ exports.QuestionAnswerscreate = async (req, res) => {
   try {
     const data = {
       questionText: req.body.questionText,
+      questionAudioUrl: req.body.questionAudioUrl,
+      questionVideoUrl: req.body.questionVideoUrl,
       options: req.body.options, // Expecting an array of options
+      optionsImageUrl: req.body.optionsImageUrl,
       correctAnswer: req.body.correctAnswer, // Store the correct option's value or index
       questionType: req.body.questionType,
       questionPoint: req.body.questionPoint,
@@ -46,10 +50,12 @@ exports.QuestionAnswerscreate = async (req, res) => {
 // };
 
 // Retrieve all questions by user ID
-exports.getAllQuestionAnswersByUserId = async (req, res) => {
+exports.getAllQuestionAnswersByPublishId = async (req, res) => {
   try {
-    const user_id = req.params.user_id;
-    const response = await QuestionAnswersTable.findAll({ where: {user_id} });
+    const publish_id = req.params.publish_id;
+    const response = await QuestionAnswersTable.findAll({
+      where: { publish_id },
+    });
 
     if (response.length > 0) {
       RESPONSE.Success.Message = MESSAGE.SUCCESS;
@@ -59,6 +65,40 @@ exports.getAllQuestionAnswersByUserId = async (req, res) => {
       res
         .status(404)
         .send({ message: `No questions found for user_id=${user_id}` });
+    }
+  } catch (error) {
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+  }
+};
+
+// Retrieve all questions where publish_id is null based on user_id
+exports.getQuestionsWithoutPublishByUserId = async (req, res) => {
+  try {
+    const user_id = req.params.user_id;
+    if (!user_id) {
+      return res.status(400).send({ message: "User ID is required" });
+    }
+    const existingUser = await User.findByPk(user_id);
+
+    if (!existingUser) {
+      return res.status(400).send({ message: "User does not exist" });
+    }
+    const response = await QuestionAnswersTable.findAll({
+      where: {
+        user_id: user_id,
+        publish_id: null,
+      },
+    });
+
+    if (response.length > 0) {
+      RESPONSE.Success.Message = MESSAGE.SUCCESS;
+      RESPONSE.Success.data = response;
+      res.status(StatusCode.OK.code).send(RESPONSE.Success);
+    } else {
+      res
+        .status(StatusCode.OK.code)
+        .send({ message: "No questions found without a publish." });
     }
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
@@ -81,7 +121,7 @@ exports.getQuestionAnswersById = async (req, res) => {
       res.status(404).send({ message: `Cannot find Question with id=${id}.` });
     }
   } catch (error) {
-    RESPONSE.Failure.Message = err.message;
+    RESPONSE.Failure.Message = error.message;
     res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
   }
 };
@@ -123,6 +163,40 @@ exports.deleteQuestionById = async (req, res) => {
       res.status(200).send(RESPONSE.Success);
     } else {
       return res.status(404).json({ error: "QuestionAnswers not found" });
+    }
+  } catch (error) {
+    RESPONSE.Failure.Message = error.message;
+    res.status(StatusCode.SERVER_ERROR.code).send(RESPONSE.Failure);
+  }
+};
+
+// delete all questions where publish_id is null based on user_id
+exports.deleteQuestionsWithoutPublishByUserId = async (req, res) => {
+  try {
+    const user_id = req.params.user_id;
+    if (!user_id) {
+      return res.status(400).send({ message: "User ID is required" });
+    }
+    const existingUser = await User.findByPk(user_id);
+
+    if (!existingUser) {
+      return res.status(400).send({ message: "User does not exist" });
+    }
+    const response = await QuestionAnswersTable.destroy({
+      where: {
+        user_id: user_id,
+        publish_id: null,
+      },
+    });
+
+    if (response > 0) {
+      RESPONSE.Success.Message = `${response} questions deleted successfully.`;
+      RESPONSE.Success.data = {};
+      res.status(StatusCode.OK.code).send(RESPONSE.Success);
+    } else {
+      res
+        .status(StatusCode.OK.code)
+        .send({ message: "No questions found without a publish." });
     }
   } catch (error) {
     RESPONSE.Failure.Message = error.message;

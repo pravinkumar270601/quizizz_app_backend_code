@@ -8,7 +8,7 @@ module.exports = (sequelize, Sequelize) => {
     username: {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: true,
+      // unique: true,
     },
     email: {
       type: Sequelize.STRING,
@@ -24,5 +24,6 @@ module.exports = (sequelize, Sequelize) => {
     },
   });
   User.hasMany(sequelize.models.quiz_question_answer, { foreignKey: 'user_id' });
+  User.hasMany(sequelize.models.publish, { foreignKey: 'user_id' });
   return User;
 };

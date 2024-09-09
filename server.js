@@ -1,12 +1,10 @@
-
-
 const express = require("express");
 const cors = require("cors");
 // const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
 const path = require("path");
-
+ 
 // require("dotenv").config();
 
 // var corsOptions = {
@@ -26,7 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = require("./app/models");
 
-db.sequelize.sync({alter:true})
+db.sequelize
+  .sync({ alter: true })
   .then(() => {
     console.log("Synced db.");
   })
@@ -43,10 +42,10 @@ db.sequelize.sync({alter:true})
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
-const routes = require("./app/routes/routes")
+const routes = require("./app/routes/routes");
 app.use("/api/v1", routes);
 
-app.use('/api/v1/uploads',express.static('uploads'))
+app.use("/api/v1/uploads", express.static("uploads"));
 // require("./app/routes/user.routes.js")(app);
 
 // set port, listen for requests
