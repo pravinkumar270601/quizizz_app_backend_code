@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../models");
-const User = db.users;
+const Staff = db.staffs;
 
 const QuestionAnswersTable = db.quiz_question_answers;
 
@@ -12,15 +12,19 @@ exports.QuestionAnswerscreate = async (req, res) => {
   try {
     const data = {
       questionText: req.body.questionText,
+      questionImageUrl: req.body.questionImageUrl,
       questionAudioUrl: req.body.questionAudioUrl,
       questionVideoUrl: req.body.questionVideoUrl,
+      questionYoutubeUrl: req.body.questionYoutubeUrl,
       options: req.body.options, // Expecting an array of options
+      AlternativeOptions: req.body.AlternativeOptions,
       optionsImageUrl: req.body.optionsImageUrl,
       correctAnswer: req.body.correctAnswer, // Store the correct option's value or index
       questionType: req.body.questionType,
       questionPoint: req.body.questionPoint,
       questionTiming: req.body.questionTiming,
-      user_id: req.body.user_id, // Associate with a user
+      staff_id: req.body.staff_id, // Associate with a staff
+      // staff_id: req.staff_id, from jwt token header
     };
 
     const response = await QuestionAnswersTable.create(data);
@@ -49,7 +53,7 @@ exports.QuestionAnswerscreate = async (req, res) => {
 //   }
 // };
 
-// Retrieve all questions by user ID
+// Retrieve all questions by staff ID
 exports.getAllQuestionAnswersByPublishId = async (req, res) => {
   try {
     const publish_id = req.params.publish_id;
@@ -64,7 +68,7 @@ exports.getAllQuestionAnswersByPublishId = async (req, res) => {
     } else {
       res
         .status(404)
-        .send({ message: `No questions found for user_id=${user_id}` });
+        .send({ message: `No questions found for staff_id=${staff_id}` });
     }
   } catch (error) {
     RESPONSE.Failure.Message = error.message;
@@ -72,21 +76,21 @@ exports.getAllQuestionAnswersByPublishId = async (req, res) => {
   }
 };
 
-// Retrieve all questions where publish_id is null based on user_id
-exports.getQuestionsWithoutPublishByUserId = async (req, res) => {
+// Retrieve all questions where publish_id is null based on staff_id
+exports.getQuestionsWithoutPublishByStaffId = async (req, res) => {
   try {
-    const user_id = req.params.user_id;
-    if (!user_id) {
-      return res.status(400).send({ message: "User ID is required" });
+    const staff_id = req.params.staff_id;
+    if (!staff_id) {
+      return res.status(400).send({ message: "staff ID is required" });
     }
-    const existingUser = await User.findByPk(user_id);
+    const existingStaff = await Staff.findByPk(staff_id);
 
-    if (!existingUser) {
-      return res.status(400).send({ message: "User does not exist" });
+    if (!existingStaff) {
+      return res.status(400).send({ message: "staff does not exist" });
     }
     const response = await QuestionAnswersTable.findAll({
       where: {
-        user_id: user_id,
+        staff_id: staff_id,
         publish_id: null,
       },
     });
@@ -170,21 +174,21 @@ exports.deleteQuestionById = async (req, res) => {
   }
 };
 
-// delete all questions where publish_id is null based on user_id
-exports.deleteQuestionsWithoutPublishByUserId = async (req, res) => {
+// delete all questions where publish_id is null based on staff_id
+exports.deleteQuestionsWithoutPublishByStaffId = async (req, res) => {
   try {
-    const user_id = req.params.user_id;
-    if (!user_id) {
-      return res.status(400).send({ message: "User ID is required" });
+    const staff_id = req.params.staff_id;
+    if (!staff_id) {
+      return res.status(400).send({ message: "staff ID is required" });
     }
-    const existingUser = await User.findByPk(user_id);
+    const existingStaff = await Staff.findByPk(staff_id);
 
-    if (!existingUser) {
-      return res.status(400).send({ message: "User does not exist" });
+    if (!existingStaff) {
+      return res.status(400).send({ message: "staff does not exist" });
     }
     const response = await QuestionAnswersTable.destroy({
       where: {
-        user_id: user_id,
+        staff_id: staff_id,
         publish_id: null,
       },
     });

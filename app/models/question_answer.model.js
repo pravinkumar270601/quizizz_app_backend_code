@@ -9,6 +9,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: true,
     },
+    questionImageUrl: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     questionAudioUrl: {
       type: Sequelize.STRING,
       allowNull: true,
@@ -17,10 +21,19 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: true,
     },
+    questionYoutubeUrl: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
     options: {
       type: Sequelize.JSON, // Store options as a JSON array
       allowNull: true,
     },
+    AlternativeOptions: {
+      type: Sequelize.JSON, // Store options as a JSON array
+      allowNull: true,
+    },
+
     optionsImageUrl: {
       type: Sequelize.JSON, // Store options as a JSON array
       allowNull: true,
@@ -51,11 +64,11 @@ module.exports = (sequelize, Sequelize) => {
       onUpdate: "CASCADE",
       onDelete: "SET NULL", // If the publish is deleted, set this field to NULL
     },
-    user_id: {
+    staff_id: {
       type: Sequelize.INTEGER,
       references: {
-        model: "user",
-        key: "user_id",
+        model: "staff",
+        key: "staff_id",
       },
       onUpdate: "CASCADE",
       onDelete: "CASCADE",

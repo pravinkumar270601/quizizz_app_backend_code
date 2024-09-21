@@ -1,11 +1,11 @@
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define("user", {
-    user_id: {
+  const Staff = sequelize.define("staff", {
+    staff_id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
+    staff_name: {
       type: Sequelize.STRING,
       allowNull: false,
       // unique: true,
@@ -23,7 +23,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
     },
   });
-  User.hasMany(sequelize.models.quiz_question_answer, { foreignKey: 'user_id' });
-  User.hasMany(sequelize.models.publish, { foreignKey: 'user_id' });
-  return User;
+  Staff.hasMany(sequelize.models.quiz_question_answer, { foreignKey: 'staff_id' });
+  Staff.hasMany(sequelize.models.publish, { foreignKey: 'staff_id' });
+  return Staff;
 };

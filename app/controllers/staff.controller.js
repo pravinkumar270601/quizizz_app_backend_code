@@ -1,12 +1,14 @@
 const db = require("../models");
-const User = db.users;
+const Staff = db.staffs;
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-// Create and save a new User
+// Create and save a new staff
 exports.create = async (req, res) => {
+  
   try {
     // Validate request
-    if (!req.body.username || !req.body.email || !req.body.password) {
+    if (!req.body.staff_name || !req.body.email || !req.body.password) {
       return res.status(400).send({
         message: "Content can not be empty!",
       });
@@ -15,29 +17,28 @@ exports.create = async (req, res) => {
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    // Create a User
-    const user = {
-      username: req.body.username,
+    // Create a staff
+    const staff = {
+      staff_name: req.body.staff_name,
       email: req.body.email,
       password: hashedPassword,
     };
 
-    // Save User in the database
-    const data = await User.create(user);
+    // Save staff in the database
+    const data = await Staff.create(staff);
     res.status(201).send({
-      user_id: data.user_id,
-      username: data.username,
+      staff_id: data.staff_id,
+      staff_name: data.staff_name,
       email: data.email,
     });
   } catch (error) {
     res.status(500).send({
-      message: error.message || "Some error occurred while creating the User.",
+      message: error.message || "Some error occurred while creating the staff.",
     });
   }
 };
 
-
-// Login User
+// Login staff
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -49,17 +50,17 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Find user by email
-    const user = await User.findOne({ where: { email } });
+    // Find staff by email
+    const staff = await Staff.findOne({ where: { email } });
 
-    if (!user) {
+    if (!staff) {
       return res.status(404).send({
-        message: "User not found!",
+        message: "staff not found!",
       });
     }
 
     // Compare password with stored hash
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, staff.password);
 
     if (!isPasswordValid) {
       return res.status(401).send({
@@ -67,12 +68,25 @@ exports.login = async (req, res) => {
       });
     }
 
+    const accesstoken = jwt.sign(
+      {
+        staff_id: staff.staff_id,
+        // staff_name: staff.staff_name,
+        // email: staff.email,
+      },
+
+      "pravinApi",
+      { expiresIn: "5m" }
+    );
+
     // Successful login
     res.status(200).send({
       message: "Login successful!",
-      user_id: user.user_id,
-      username: user.username,
-      email: user.email,
+      // staff_id: staff.staff_id,
+      // staff_name: staff.staff_name,
+      // email: staff.email,
+      // token: { accesstoken },
+      accesstoken,
     });
   } catch (error) {
     res.status(500).send({

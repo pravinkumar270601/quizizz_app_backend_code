@@ -26,7 +26,8 @@ db.sequelize = sequelize;
 // db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
 db.quiz_question_answers = require("./question_answer.model.js")(sequelize, Sequelize)
 db.publishs = require("./publish_user.model.js")(sequelize, Sequelize)
-db.users = require("./user.model.js")(sequelize, Sequelize)
+db.staffs = require("./staff.model.js")(sequelize, Sequelize)
+db.students = require("./student.model.js")(sequelize, Sequelize)
 // Establish relationships
 
 
