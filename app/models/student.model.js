@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
+        // unique: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -21,7 +21,7 @@ module.exports = (sequelize, Sequelize) => {
       phone_number: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true, // Ensures no duplicate phone numbers
+        // unique: true, // Ensures no duplicate phone numbers
       },
       createdAt: {
         type: Sequelize.DATE,

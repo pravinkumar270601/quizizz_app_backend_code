@@ -5,6 +5,7 @@ const videoController = require("../controllers/upload_video.controller.js");
 const audioController = require("../controllers/upload_audio.controller.js");
 const staffController = require("../controllers/staff.controller.js");
 const studentController = require("../controllers/student.controllers.js");
+const studentDasbordController = require("../controllers/studentPublishScore.controller.js") 
 const router = require("express").Router();
 const isAuthenticated = require("../middleware/auth_middleware.js");
 
@@ -53,6 +54,9 @@ router.put("/updatePublishById/:id", publishController.updatepublishById);
 router.delete("/deletePublishId/:id", publishController.deletepublishById);
 router.delete("/deletePublishId/:id", publishController.deletepublishById);
 router.post("/grantAccessToStudent", publishController.grantAccessToStudent);
+router.post("/revokeAccessToStudent", publishController.revokeAccessToStudent);
+
+
 router.get("/getPublishByStudentId/student/:student_id", publishController.getPublishByStudentId);
 
 
@@ -73,6 +77,14 @@ router.post("/staffLogin", staffController.login);
 router.post("/studentSignup", studentController.studentSignup);
 router.post("/studentLogin", studentController.studentLogin);
 router.get('/getAllStudents',studentController.getAllStudents);
+router.get('/getStudentsWithAccessByPublishId/publish/:publish_id',studentController.getStudentsWithAccessByPublishId);
+router.get('/getAccessGrantedStudentsInfoBypublishId/publish/:publish_id',studentController.getAccessGrantedStudentsInfo);
+
+
+// student dasbord 
+
+router.post("/studentScorePost", studentDasbordController.submitStudentScore);
+router.get('/getAllPublishesWithStudentScore/student/:student_id',studentDasbordController.getAllPublishesWithStudentScore);
 
 
 module.exports = router;

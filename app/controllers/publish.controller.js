@@ -1,10 +1,10 @@
 const Sequelize = require("sequelize");
 const db = require("../models");
-const Staff = db.staffs;
-const Access = db.accesses;
 
+const Staff = db.staffs;
 const PublishTable = db.publishs;
 const QuestionAnswersTable = db.quiz_question_answers;
+const StudentPublishScoreTable = db.student_publish_scores;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -178,9 +178,52 @@ exports.deletepublishById = async (req, res) => {
 };
 
 // In your publish controller file
+// exports.grantAccessToStudent = async (req, res) => {
+//   const { publish_id, staff_id, student_id } = req.body; // Expecting these in the body
+
+//   try {
+//     // Find the publish record by publish_id and staff_id
+//     const publish = await PublishTable.findOne({
+//       where: { publish_id, staff_id },
+//     });
+
+//     if (!publish) {
+//       return res
+//         .status(404)
+//         .json({ message: "Publish not found or staff ID does not match." });
+//     }
+
+//     // Parse the existing access array, if it exists
+//     let accessGrantedTo = publish.access_granted_to
+//       ? JSON.parse(publish.access_granted_to)
+//       : publish.access_granted_to;
+
+//     // Check if the student already has access
+//     if (accessGrantedTo.includes(student_id)) {
+//       return res
+//         .status(400)
+//         .json({ message: "Access already granted to this student" });
+//     }
+
+//     // Grant access by adding the student_id to the array
+//     accessGrantedTo.push(student_id);
+
+//     // Update the publish with the new access array
+//     await PublishTable.update(
+//       { access_granted_to: JSON.stringify(accessGrantedTo) }, // Convert back to JSON string
+//       { where: { publish_id, staff_id } } // Ensure you update the correct entry
+//     );
+
+//     res.status(200).json({ message: "Access granted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 // In your publish controller file
+
 exports.grantAccessToStudent = async (req, res) => {
-  const { publish_id, staff_id, student_id } = req.body; // Expecting these in the body
+  const { publish_id, staff_id, student_id } = req.body;
 
   try {
     // Find the publish record by publish_id and staff_id
@@ -194,50 +237,13 @@ exports.grantAccessToStudent = async (req, res) => {
         .json({ message: "Publish not found or staff ID does not match." });
     }
 
-    // Parse the existing access array, if it exists
+    // Log the current value for debugging
+    // console.log("Current access_granted_to:", publish.access_granted_to);
+
+    // Initialize accessGrantedTo
     let accessGrantedTo = publish.access_granted_to
       ? JSON.parse(publish.access_granted_to)
       : [];
-
-    // Check if the student already has access
-    if (accessGrantedTo.includes(student_id)) {
-      return res
-        .status(400)
-        .json({ message: "Access already granted to this student" });
-    }
-
-    // Grant access by adding the student_id to the array
-    accessGrantedTo.push(student_id);
-
-    // Update the publish with the new access array
-    await PublishTable.update(
-      { access_granted_to: JSON.stringify(accessGrantedTo) }, // Convert back to JSON string
-      { where: { publish_id, staff_id } } // Ensure you update the correct entry
-    );
-
-    res.status(200).json({ message: "Access granted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-// In your publish controller file
-
-exports.grantAccessToStudent = async (req, res) => {
-  const { publish_id, staff_id, student_id } = req.body;
-
-  try {
-    // Find the publish record by publish_id and staff_id
-    const publish = await PublishTable.findOne({ where: { publish_id, staff_id } });
-    
-    if (!publish) {
-      return res.status(404).json({ message: 'Publish not found or staff ID does not match.' });
-    }
-
-    // Log the current value for debugging
-    console.log('Current access_granted_to:', publish.access_granted_to);
-
-    // Initialize accessGrantedTo
-    let accessGrantedTo = publish.access_granted_to ? JSON.parse(publish.access_granted_to) : [];
 
     // Ensure accessGrantedTo is an array
     if (!Array.isArray(accessGrantedTo)) {
@@ -246,7 +252,13 @@ exports.grantAccessToStudent = async (req, res) => {
 
     // Check if the student already has access
     if (accessGrantedTo.includes(student_id)) {
-      return res.status(400).json({ message: 'Access already granted to this student' });
+      RESPONSE.Success.Message = "Access already granted to this student";
+      RESPONSE.Success.data = {};
+
+      return res.status(200).send(RESPONSE.Success);
+      // return res
+      //   .status(200)
+      //   .json({ message: "Access already granted to this student" });
     }
 
     // Grant access by adding the student_id to the array
@@ -259,13 +271,83 @@ exports.grantAccessToStudent = async (req, res) => {
       { where: { publish_id, staff_id } }
     );
 
-    res.status(200).json({ message: 'Access granted successfully' });
+    // Create a new StudentPublishScore entry with default values (score = 0, status = "pending")
+    await StudentPublishScoreTable.create({
+      publish_id,
+      student_id,
+      score: 0, // Default score
+      status: "pending", // Default status
+    });
+
+    RESPONSE.Success.Message = "Access granted successfully";
+    RESPONSE.Success.data = {};
+
+    res.status(200).send(RESPONSE.Success);
+
+    // res.status(200).json({ message: "Access granted successfully" });
   } catch (error) {
-    console.error('Error in grantAccessToStudent:', error); // Log the error for debugging
+    console.error("Error in grantAccessToStudent:", error); // Log the error for debugging
     res.status(500).json({ message: error.message });
   }
 };
 
+exports.revokeAccessToStudent = async (req, res) => {
+  const { publish_id, staff_id, student_id } = req.body;
+
+  try {
+    // Find the publish record by publish_id and staff_id
+    const publish = await PublishTable.findOne({
+      where: { publish_id, staff_id },
+    });
+
+    if (!publish) {
+      return res
+        .status(404)
+        .json({ message: "Publish not found or staff ID does not match." });
+    }
+
+    // Parse the access_granted_to array
+    let accessGrantedTo = publish.access_granted_to
+      ? JSON.parse(publish.access_granted_to)
+      : [];
+
+    // Ensure accessGrantedTo is an array
+    if (!Array.isArray(accessGrantedTo)) {
+      accessGrantedTo = [];
+    }
+
+    // Check if the student has access
+    if (!accessGrantedTo.includes(student_id)) {
+      RESPONSE.Success.Message = "Access not granted to this student";
+      RESPONSE.Success.data = {};
+  
+      return res.status(200).send(RESPONSE.Success);
+      // return res.status(404).json({ message: "Access not granted to this student." });
+    }
+
+    // Revoke access by removing the student_id from the array
+    accessGrantedTo = accessGrantedTo.filter(id => id !== student_id);
+
+    // Update the publish with the modified access_granted_to array
+    await PublishTable.update(
+      { access_granted_to: accessGrantedTo},
+      { where: { publish_id, staff_id } }
+    );
+
+    // Optionally, remove the student's score entry from StudentPublishScoreTable
+    await StudentPublishScoreTable.destroy({
+      where: { publish_id, student_id },
+    });
+
+    RESPONSE.Success.Message = "Access revoked successfully";
+    RESPONSE.Success.data = {};
+
+    res.status(200).send(RESPONSE.Success);
+  } catch (error) {
+    console.error("Error in revokeAccessToStudent:", error); // Log the error for debugging
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 // Get publishes by student_id
@@ -284,12 +366,12 @@ exports.getPublishByStudentId = async (req, res) => {
       ),
     });
 
-// 1: Indicates that the specified value (in this case, student_id) exists in the JSON array.
-// 0: Indicates that the value does not exist in the JSON array.
+    // 1: Indicates that the specified value (in this case, student_id) exists in the JSON array.
+    // 0: Indicates that the value does not exist in the JSON array.
 
     if (publishes.length === 0) {
       return res
-        .status(404)
+        .status(200)
         .json({ message: "No publishes found for this student" });
     }
 
@@ -298,7 +380,6 @@ exports.getPublishByStudentId = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // ---------------------- delete the old image code from chatgpt -----
 // const fs = require('fs');

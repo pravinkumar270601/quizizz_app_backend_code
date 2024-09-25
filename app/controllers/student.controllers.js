@@ -2,7 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../models");
 const Student = db.students;
+const PublishTable = db.publishs;
+const StudentPublishScoreTable = db.student_publish_scores;
 const Sequelize = require("sequelize");
+
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -18,9 +21,12 @@ exports.studentSignup = async (req, res) => {
     });
 
     if (existingStudent) {
-      return res
-        .status(400)
-        .send({ message: "Email and phone number already in use" });
+      RESPONSE.Success.Message = "Email and phone number already in use";
+      RESPONSE.Success.data = {};
+      return res.status(200).send(RESPONSE.Success);
+      // return res
+      //   .status(200)
+      //   .send({ message: "Email and phone number already in use" });
     }
 
     // Hash password
@@ -58,17 +64,23 @@ exports.studentLogin = async (req, res) => {
     });
 
     if (!student) {
-      return res
-        .status(400)
-        .send({ message: "Invalid email/phone or password" });
+      RESPONSE.Success.Message = "Invalid email/phone or password";
+      RESPONSE.Success.data = {};
+      return res.status(200).send(RESPONSE.Success);
+      // return res
+      //   .status(400)
+      //   .send({ message: "Invalid email/phone or password" });
     }
 
     // Compare passwords
     const validPassword = await bcrypt.compare(password, student.password);
     if (!validPassword) {
-      return res
-        .status(400)
-        .send({ message: "Invalid email/phone or password" });
+      RESPONSE.Success.Message = "Invalid password";
+      RESPONSE.Success.data = {};
+      return res.status(200).send(RESPONSE.Success);
+      // return res
+      //   .status(400)
+      //   .send({ message: "Invalid email/phone or password" });
     }
 
     // Generate JWT
@@ -76,16 +88,29 @@ exports.studentLogin = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(200).send({
-      message: "Login successful",
+    RESPONSE.Success.Message = "Login successful";
+    RESPONSE.Success.data = {
       token,
       student: {
-        id: student.student_id,
+        student_id: student.student_id,
         student_name: student.student_name,
         email: student.email,
         phone_number: student.phone_number,
       },
-    });
+    };
+
+    res.status(201).send(RESPONSE.Success);
+
+    // res.status(200).send({
+    //   message: "Login successful",
+    //   token,
+    //   student: {
+    //     id: student.student_id,
+    //     student_name: student.student_name,
+    //     email: student.email,
+    //     phone_number: student.phone_number,
+    //   },
+    // });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -99,11 +124,147 @@ exports.getAllStudents = async (req, res) => {
       });
   
       if (students.length === 0) {
-        return res.status(404).json({ message: 'No students found' });
+        return res.status(200).json({ message: 'No students found' });
       }
   
-      res.status(200).json({ data: students });
+      RESPONSE.Success.Message = MESSAGE.SUCCESS;
+      RESPONSE.Success.data = students ;
+  
+      res.status(200).send(RESPONSE.Success);
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }
   };
+
+  // In your student controller file
+// exports.getStudentsWithAccessByPublishId = async (req, res) => {
+//   const { publish_id } = req.params;
+
+//   try {
+//     // Fetch the publish record by publish_id
+//     const publish = await PublishTable.findOne({
+//       where: { publish_id },
+//       attributes: ['access_granted_to'], // Only fetch access_granted_to
+//     });
+
+//     if (!publish) {
+//       return res.status(404).json({ message: "Publish not found." });
+//     }
+
+//     // Fetch all students
+//     const students = await Student.findAll({
+//       attributes: ['student_id', 'student_name', 'email'], // Select the required fields
+//     });
+
+//     // Convert access_granted_to to an array for easy lookup
+//     const accessGrantedTo = publish.access_granted_to || [];
+
+//     // Map over the students and add access info
+//     const studentsWithAccess = students.map((student) => {
+//       const accessGranted = accessGrantedTo.includes(student.student_id);
+//       return {
+//         student_id: student.student_id,
+//         student_name: student.student_name,
+//         email: student.email,
+//         access_granted: accessGranted,
+//       };
+//     });
+
+//     // Return the result
+//     res.status(200).json(studentsWithAccess);
+//   } catch (error) {
+//     console.error('Error in getStudentsWithAccessByPublishId:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+exports.getStudentsWithAccessByPublishId = async (req, res) => {
+  const { publish_id } = req.params;
+
+  try {
+    // Fetch the publish record by publish_id
+    const publish = await PublishTable.findOne({
+      where: { publish_id },
+      attributes: ['access_granted_to'], // Only fetch access_granted_to
+    });
+
+    if (!publish) {
+      return res.status(404).json({ message: "Publish not found." });
+    }
+
+    // Ensure access_granted_to is an array, parse it if necessary
+    let accessGrantedTo = publish.access_granted_to || [];
+    if (typeof accessGrantedTo === 'string') {
+      accessGrantedTo = JSON.parse(accessGrantedTo); // If stored as a JSON string, parse it
+    }
+
+    // Fetch all students
+    const students = await Student.findAll({
+      attributes: ['student_id', 'student_name', 'email'], // Select the required fields
+    });
+
+    // Map over the students and add access info
+    const studentsWithAccess = students.map((student) => {
+      const accessGranted = accessGrantedTo.includes(student.student_id);
+      return {
+        student_id: student.student_id,
+        student_name: student.student_name,
+        email: student.email,
+        access_granted: accessGranted,
+      };
+    });
+
+    // Return the result
+    res.status(200).json(studentsWithAccess);
+  } catch (error) {
+    console.error('Error in getStudentsWithAccessByPublishId:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+exports.getAccessGrantedStudentsInfo = async (req, res) => {
+  const { publish_id } = req.params;
+
+  try {
+    // Fetch the publish record by publish_id
+    const publish = await PublishTable.findOne({
+      where: { publish_id },
+      attributes: ['access_granted_to'], // Only fetch access_granted_to
+    });
+
+    if (!publish) {
+      return res.status(404).json({ message: "Publish not found." });
+    }
+
+    // Ensure access_granted_to is an array, parse it if necessary
+    let accessGrantedTo = publish.access_granted_to || [];
+    if (typeof accessGrantedTo === 'string') {
+      accessGrantedTo = JSON.parse(accessGrantedTo); // If stored as a JSON string, parse it
+    }
+
+    // Fetch students with access granted and their scores
+    const studentsWithScores = await Student.findAll({
+      where: {
+        student_id: accessGrantedTo, // Only get students with granted access
+      },
+      include: [{
+        model: db.student_publish_scores,
+        as: 'scores',
+        attributes: ['score', 'status'], // Include score and status
+        where: { publish_id }, // Only include scores for the specific publish
+      }],
+      attributes: ['student_id', 'student_name', 'email'], // Select the required fields
+    });
+
+    // Return the result
+    
+    res.status(200).json(studentsWithScores);
+  } catch (error) {
+    console.error('Error in getAccessGrantedStudentsInfo:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+

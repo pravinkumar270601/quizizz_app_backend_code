@@ -1,5 +1,8 @@
 const multer = require("multer");
 const path = require("path");
+const RESPONSE = require("../constants/response");
+const { MESSAGE } = require("../constants/message");
+const { StatusCode } = require("../constants/HttpStatusCode");
 
 // Upload Image Controller
 
@@ -47,11 +50,18 @@ exports.uploadImage = (req, res) => {
       return res.status(400).send({ message: err });
     }
     if (!req.file) {
-      return res.status(400).send({ message: "No file uploaded!" });
+      RESPONSE.Success.Message = "No file uploaded!";
+      RESPONSE.Success.data = {}
+      return res.status(200).send(RESPONSE.Success);
+      // return res.status(400).send({ message: "No file uploaded!" });
     }
-    res.status(200).send({
-      message: "File uploaded successfully!",
+    RESPONSE.Success.Message = "File uploaded successfully!";
+    RESPONSE.Success.data = {
       imageUrl: `uploads/images/${req.file.filename}`,
-    });
+    };
+    res.status(200).send(RESPONSE.Success);
+    // res.status(200).send({
+    //   imageUrl: `uploads/images/${req.file.filename}`,
+    // });
   });
 };

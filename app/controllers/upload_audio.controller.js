@@ -20,7 +20,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10000000 }, // limit file size to 10MB
   fileFilter: function (req, file, cb) {
-    const filetypes = /mp3|wav|ogg|m4a/;
+    const filetypes = /mp3|wav|ogg|m4a|mpeg/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     if (mimetype && extname) {
@@ -41,7 +41,7 @@ exports.uploadAudio = (req, res) => {
 
     if (!req.file) {
       RESPONSE.Failure.Message = "No file uploaded";
-      return res.status(StatusCode.BAD_REQUEST.code).send(RESPONSE.Failure);
+      return res.status(StatusCode.OK.code).send(RESPONSE.Failure);
     }
 
     RESPONSE.Success.Message = "Audio uploaded successfully";
