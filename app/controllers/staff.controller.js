@@ -44,11 +44,12 @@ exports.create = async (req, res) => {
     const data = await Staff.create(staff);
 
     RESPONSE.Success.Message = "Staff registered successfully";
-    RESPONSE.Success.data = {
-      staff_id: data.staff_id,
-      staff_name: data.staff_name,
-      email: data.email,
-    };
+    // RESPONSE.Success.data = {
+    //   staff_id: data.staff_id,
+    //   staff_name: data.staff_name,
+    //   email: data.email,
+    // };
+    RESPONSE.Success.data = data
 
     res.status(201).send(RESPONSE.Success);
     // res.status(201).send({

@@ -3,6 +3,7 @@ const db = require("../models");
 const Staff = db.staffs;
 
 const QuestionAnswersTable = db.quiz_question_answers;
+const PublishTable = db.publishs;
 
 const RESPONSE = require("../constants/response");
 const { MESSAGE } = require("../constants/message");
@@ -25,6 +26,7 @@ exports.QuestionAnswerscreate = async (req, res) => {
       questionTiming: req.body.questionTiming,
       staff_id: req.body.staff_id, // Associate with a staff
       // staff_id: req.staff_id, from jwt token header
+      publish_id: req.body.publish_id || null,
     };
 
     const response = await QuestionAnswersTable.create(data);
@@ -157,11 +159,35 @@ exports.updateQuestionAnswersById = async (req, res) => {
 exports.deleteQuestionById = async (req, res) => {
   try {
     const id = req.params.id;
+
+    // Step 1: Find the question with the given id and get its publish_id
+    const question = await QuestionAnswersTable.findByPk(id);
+
+    if (!question) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    const publishId = question.publish_id;
+
     const deleted = await QuestionAnswersTable.destroy({
       where: { question_id: id },
     });
 
     if (deleted) {
+      // Step 3: Fetch all remaining questions for the same publish_id
+      const remainingQuestions = await QuestionAnswersTable.findAll({
+        where: { publish_id: publishId },
+      });
+
+      // Calculate the new total_questions length
+      const totalQuestions = remainingQuestions.length;
+
+      // Step 4: Update the total_questions in the PublishTable
+      await PublishTable.update(
+        { total_questions: totalQuestions },
+        { where: { publish_id: publishId }}
+      );
+
       RESPONSE.Success.Message = MESSAGE.DELETE;
       RESPONSE.Success.data = {};
       res.status(200).send(RESPONSE.Success);

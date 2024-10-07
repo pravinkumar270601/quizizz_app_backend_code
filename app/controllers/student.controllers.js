@@ -120,7 +120,7 @@ exports.getAllStudents = async (req, res) => {
     try {
       // Fetch students with only specific fields
       const students = await Student.findAll({
-        attributes: ['student_id', 'student_name', 'email'],
+        attributes: ['student_id', 'student_name', 'email','phone_number'],
       });
   
       if (students.length === 0) {
@@ -197,7 +197,7 @@ exports.getStudentsWithAccessByPublishId = async (req, res) => {
       accessGrantedTo = JSON.parse(accessGrantedTo); // If stored as a JSON string, parse it
     }
 
-    // Fetch all students
+    // Fetch all students 
     const students = await Student.findAll({
       attributes: ['student_id', 'student_name', 'email'], // Select the required fields
     });
@@ -210,11 +210,16 @@ exports.getStudentsWithAccessByPublishId = async (req, res) => {
         student_name: student.student_name,
         email: student.email,
         access_granted: accessGranted,
+        publish_id:publish_id
       };
     });
 
     // Return the result
-    res.status(200).json(studentsWithAccess);
+    RESPONSE.Success.Message = MESSAGE.SUCCESS;
+    RESPONSE.Success.data = studentsWithAccess ;
+
+    res.status(200).send(RESPONSE.Success);
+    // res.status(200).json(studentsWithAccess);
   } catch (error) {
     console.error('Error in getStudentsWithAccessByPublishId:', error);
     res.status(500).json({ message: error.message });
@@ -258,8 +263,11 @@ exports.getAccessGrantedStudentsInfo = async (req, res) => {
     });
 
     // Return the result
-    
-    res.status(200).json(studentsWithScores);
+    RESPONSE.Success.Message = MESSAGE.SUCCESS;
+    RESPONSE.Success.data = studentsWithScores ;
+
+    res.status(200).send(RESPONSE.Success);
+    // res.status(200).json(studentsWithScores);
   } catch (error) {
     console.error('Error in getAccessGrantedStudentsInfo:', error);
     res.status(500).json({ message: error.message });

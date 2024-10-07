@@ -33,12 +33,17 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
       },
       access_granted_to: {
-      type: Sequelize.JSON, // Store an array of user IDs
-      allowNull: true,
-    },
-      question_ids: {
-        type: Sequelize.JSON  ,
+        type: Sequelize.JSON, // Store an array of user IDs
+        allowNull: true,
+      },
+      // question_ids: {
+      //   type: Sequelize.JSON,
+      //   allowNull: false,
+      // },
+      total_questions: {
+        type: Sequelize.INTEGER, // Store total number of questions
         allowNull: false,
+        defaultValue: 0, // Default value before calculation
       },
       staff_id: {
         type: Sequelize.INTEGER,

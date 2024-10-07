@@ -1,5 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
-    const Student = sequelize.define("student", {
+  const Student = sequelize.define(
+    "student",
+    {
       student_id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -23,11 +25,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false,
         // unique: true, // Ensures no duplicate phone numbers
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
-      },
-    });
-    return Student;
-  };
-  
+    },
+    {
+      timestamps: true, // Automatically adds createdAt and updatedAt fields
+    }
+  );
+  return Student;
+};

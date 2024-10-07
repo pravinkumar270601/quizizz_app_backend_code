@@ -35,6 +35,10 @@ db.student_publish_scores = require("./student_publish_score.model.js")(
   sequelize,
   Sequelize
 );
+db.student_answers = require("./student_answer.model.js")(sequelize, Sequelize);
+
+
+
 
 // Establish relationships
 db.publishs.associate = (models) => {
@@ -62,6 +66,20 @@ db.students.associate = (models) => {
   });
 };
 
+db.student_answers.associate = (models) => {
+  db.student_answers.belongsTo(models.students, {
+    foreignKey: "student_id",
+    as: "student", // Alias to reference the student
+  });
+  db.student_answers.belongsTo(models.publishs, {
+    foreignKey: "publish_id",
+    as: "publish", // Alias to reference the publish
+  });
+  db.student_answers.belongsTo(models.quiz_question_answers, {
+    foreignKey: "question_id",
+    as: "question", // Alias to reference the question
+  });
+};
 
 
 // Initialize associations
